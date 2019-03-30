@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+android:background="@color/colorAccent">
+
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/conteiner_frame_list"
+            android:layout_above="@+id/footer">
+    </FrameLayout>
+
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/footer">
+        <TextView
+                android:layout_margin="24dp"
+                android:id="@+id/tv_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Меню (1)"
+                android:layout_centerHorizontal="true"
+        />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

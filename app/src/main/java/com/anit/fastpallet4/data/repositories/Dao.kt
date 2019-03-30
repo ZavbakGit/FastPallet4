@@ -1,0 +1,77 @@
+package com.anit.fastpallet4.data.repositories
+
+import com.anit.fastpallet4.app.App
+import com.anit.fastpallet4.data.repositories.maping.Maping
+import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
+import com.anit.fastpallet4.domain.intity.MetaObj
+import com.anit.fastpallet4.data.db.intity.DocumentRm
+import com.anit.fastpallet4.data.db.intity.ItemListRm
+import com.anit.fastpallet4.domain.intity.listmetaobj.ItemListMetaObj
+
+import io.reactivex.Flowable
+import io.realm.Realm
+import javax.inject.Inject
+
+class Dao {
+
+    @Inject
+    lateinit var realm: Realm
+
+    @Inject
+    lateinit var maping: Maping
+
+    init {
+       App.appComponent.inject(this)
+    }
+
+    fun save(metaObject: MetaObj) {
+        realm.executeTransaction {
+            //Сохранили объект
+            realm.copyToRealmOrUpdate(maping.map(metaObject as CreatePallet))
+            //Сохранили журнал
+            realm.copyToRealmOrUpdate(maping.map(maping.mapToList(metaObject)))
+        }
+    }
+
+    fun dell(metaObject: MetaObj) {
+        realm.executeTransaction {
+
+            realm.where(DocumentRm::class.java)
+                .equalTo("guid", metaObject.getGuid())
+                .findAll().deleteAllFromRealm()
+
+            realm.where(ItemListRm::class.java)
+                .equalTo("guid", metaObject.getGuid())
+                .findAll().deleteAllFromRealm()
+
+
+        }
+    }
+
+    fun getMetaObj(guid: String): MetaObj? {
+        var doc = realm.where(DocumentRm::class.java)
+            .equalTo("guid", guid)
+            .findFirst()
+
+        return if (doc == null) {
+            null
+        } else {
+            maping.map(doc)
+        }
+
+    }
+
+    fun getFlowableList(): Flowable<List<ItemListMetaObj?>> {
+        return realm.where(ItemListRm::class.java)
+            .findAll()
+            .asFlowable()
+            .map { it ->
+                it.map { doc ->
+                    maping.map(doc)
+                }
+            }
+    }
+
+}
+
+
