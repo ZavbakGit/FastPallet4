@@ -10,8 +10,8 @@ class CreatePallet : MetaObj(type = Type.CREATE_PALLET) {
 
     val stringProducts: MutableList<StringProduct> = mutableListOf()
 
-    fun newStringProduct() {
-        StringProduct()
+    fun addStringProduct(stringProduct:StringProduct) {
+        stringProducts.add(stringProduct)
     }
 
     fun dellStringProduct(index: Int) {

@@ -15,6 +15,9 @@ import com.anit.fastpallet4.presentaition.presenter.ListDocPresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseActivity
 import com.anit.fastpallet4.presentaition.presenter.MainPresenter
 import com.anit.fastpallet4.presentaition.presenter.Model
+import com.anit.fastpallet4.presentaition.presenter.createpallet.doc.CreatePalletPresenter
+import com.anit.fastpallet4.presentaition.presenter.createpallet.pallet.PalletCreatePalletPresenter
+import com.anit.fastpallet4.presentaition.presenter.createpallet.product.ProductCreatePalletPresenter
 import dagger.Component
 import javax.inject.Singleton
 
@@ -44,6 +47,12 @@ interface AppComponent {
     fun inject(listDocPresenter: ListDocPresenter)
     fun inject(model: com.anit.fastpallet4.presentaition.presenter.Inventory.Model)
     fun inject(maping: Maping)
+    fun inject(model: com.anit.fastpallet4.presentaition.presenter.createpallet.doc.Model)
+    fun inject(model: com.anit.fastpallet4.presentaition.presenter.createpallet.product.Model)
+    fun inject(createPalletPresenter: CreatePalletPresenter)
+    fun inject(productCreatePalletPresenter: ProductCreatePalletPresenter)
+    fun inject(palletCreatePalletPresenter: PalletCreatePalletPresenter)
+    fun inject(model: com.anit.fastpallet4.presentaition.presenter.createpallet.pallet.Model)
 
 }
 

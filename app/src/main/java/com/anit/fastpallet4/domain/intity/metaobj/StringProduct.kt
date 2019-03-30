@@ -24,7 +24,7 @@ class StringProduct {
     var countBox: Int = 0
 
 
-    @ContextualSerialization
+
     var dataChanged: Date? = null
     var isWasLoadedLastTime: Boolean? = null
 

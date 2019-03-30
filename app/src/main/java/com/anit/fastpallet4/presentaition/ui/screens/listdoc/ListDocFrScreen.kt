@@ -60,7 +60,8 @@ class ListDocFrScreen : BaseFragment(), ListDocView {
         bagDisposable.add(
             listFrag.publishSubjectItemClick
                 .subscribe {
-                    presenter.onClickItem(listFrag.getList().get(it).identifier!!)
+                    var item = listFrag.getList().get(it)
+                    presenter.onClickItem(item.identifier!!,item.type)
                 }
 
         )

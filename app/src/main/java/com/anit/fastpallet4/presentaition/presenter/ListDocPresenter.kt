@@ -1,14 +1,19 @@
 package com.anit.fastpallet4.presentaition.presenter
 
 import com.anit.fastpallet4.app.App
+import com.anit.fastpallet4.domain.intity.Type
+import com.anit.fastpallet4.domain.intity.Type.CREATE_PALLET
 import com.anit.fastpallet4.domain.intity.Type.INVENTORY_PALLET
+import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
 import com.anit.fastpallet4.domain.intity.metaobj.Status.NEW
+import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
 import com.anit.fastpallet4.domain.usecase.UseCaseGetListMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorCreatorMetaObj
 import com.anit.fastpallet4.presentaition.presenter.Model.MAIN_MENU.*
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
 import com.anit.fastpallet4.presentaition.ui.screens.Inventory.InventoryFrScreen
+import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.doc.CreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocView
 import com.arellomobile.mvp.InjectViewState
@@ -44,14 +49,28 @@ class ListDocPresenter(
     fun onClickMainPopMenu(itemId: Int): Boolean {
         when (model.getMainMenuById(itemId)) {
             INVENTORY -> model.createNewInventory()
+            LOAD -> model.createTestCreatePallet()
         }
         return true
     }
 
-    fun onClickItem(guid: String) {
-        router.navigateTo(
-            screens.getInventoryScreen(InventoryFrScreen.InputParamObj(guid = guid))
-        )
+    fun onClickItem(guid: String, type: Int?) {
+
+        var type = Type.getTypeById(type ?: 0)
+
+
+        when (type) {
+            INVENTORY_PALLET -> router.navigateTo(
+                screens.getInventoryScreen(InventoryFrScreen.InputParamObj(guid = guid))
+            )
+
+            CREATE_PALLET -> router.navigateTo(
+                screens.getCreatePalletFrScreen(CreatePalletFrScreen.InputParamObj(guid = guid))
+            )
+
+        }
+
+
     }
 
 }
@@ -103,18 +122,36 @@ class Model {
         doc.save()
     }
 
+    fun createTestCreatePallet() {
+        var interactor = InteractorCreatorMetaObj(CREATE_PALLET)
+        var doc = interactor.create() as CreatePallet
+        doc.date = Date()
+        doc.status = NEW
+        doc.description = "Формирование паллет"
+
+        (0..Random().nextInt(5)).forEach {
+            var strProd = StringProduct()
+            strProd.nameProduct = "Product $it"
+            doc.stringProducts.add(strProd)
+        }
+
+        doc.save()
+    }
+
     fun getFlowableListItem() =
         interactorGetList.get()
             .map {
                 it.map {
                     ItemList(
                         identifier = it!!.getGuid(),
-                        info = "${it?.description} ${it?.getGuid() ?: ""}"
+                        info = "${it?.description} ${it?.getGuid() ?: ""}",
+                        type = it.type.id
 
                     )
                 }
             }
 }
+
 
 
 
