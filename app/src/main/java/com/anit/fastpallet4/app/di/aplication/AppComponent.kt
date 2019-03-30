@@ -3,6 +3,7 @@ package com.anit.fastpallet4.app.di.aplication
 
 import com.anit.fastpallet4.app.di.activity.ActivityComponent
 import com.anit.fastpallet4.app.di.activity.ActivityModule
+import com.anit.fastpallet4.app.di.modules.InteractorModule
 import com.anit.fastpallet4.app.di.modules.MapingModule
 import com.anit.fastpallet4.app.di.modules.RealmModule
 import com.anit.fastpallet4.app.di.modules.RepositoryModule
@@ -14,6 +15,7 @@ import com.anit.fastpallet4.navigation.LocalNavigationModule
 import com.anit.fastpallet4.navigation.NavigationModule
 import com.anit.fastpallet4.presentaition.ui.base.BaseActivity
 import com.anit.fastpallet4.presentaition.presenter.MainPresenter
+import com.anit.fastpallet4.presentaition.presenter.Model
 import dagger.Component
 import javax.inject.Singleton
 
@@ -25,7 +27,8 @@ import javax.inject.Singleton
         LocalNavigationModule::class,
         RealmModule::class,
         MapingModule::class,
-        RepositoryModule::class
+        RepositoryModule::class,
+        InteractorModule::class
     )
 )
 @Singleton
@@ -37,6 +40,7 @@ interface AppComponent {
     fun inject(interactorUseCaseMetaObj: InteractorUseCaseMetaObj)
     fun inject(baseActivity: BaseActivity)
     fun inject(mainPresenter: MainPresenter)
+    fun inject(model: Model)
 
 }
 

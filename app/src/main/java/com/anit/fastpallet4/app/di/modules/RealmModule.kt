@@ -15,8 +15,9 @@ class RealmModule{
     fun provideRealmInitLocal(): RealmInitLocal = RealmInitLocal()
 
     //Специально не Singleton пусть запрашивает каждый раз
-    @Provides
-    fun provideRealm(realmInitLocal:RealmInitLocal): Realm = realmInitLocal.getLocalInstance()
+//    @Singleton
+//    @Provides
+//    fun provideRealm(realmInitLocal:RealmInitLocal): Realm = realmInitLocal.getLocalInstance()
 
 
 }

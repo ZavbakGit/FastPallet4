@@ -1,19 +1,109 @@
 package com.anit.fastpallet4.presentaition.presenter
 
+import com.anit.fastpallet4.app.App
+import com.anit.fastpallet4.domain.intity.Type.INVENTORY_PALLET
+import com.anit.fastpallet4.domain.intity.metaobj.Status.NEW
+import com.anit.fastpallet4.domain.usecase.UseCaseGetListMetaObj
+import com.anit.fastpallet4.domain.usecase.interactor.InteractorCreatorMetaObj
+import com.anit.fastpallet4.presentaition.presenter.Model.MAIN_MENU.*
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
-import com.anit.fastpallet4.presentaition.ui.base.BaseView
+import com.anit.fastpallet4.presentaition.ui.base.ItemList
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocFrScreen
+import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocView
 import com.arellomobile.mvp.InjectViewState
 import ru.terrakok.cicerone.Router
+import java.util.*
+import javax.inject.Inject
 
 @InjectViewState
-class ListDocPresenter(router: Router, val inputParamObj: ListDocFrScreen.InputParamObj?) :
-    BasePresenter<BaseView>(router) {
+class ListDocPresenter(
+
+    router: Router,
+    val inputParamObj: ListDocFrScreen.InputParamObj?
+
+) : BasePresenter<ListDocView>(router) {
+
+    val model = Model()
+
     override fun onBackPressed(): Boolean {
         router.exit()
         return true
     }
+
+    fun onClickMainMenu() {
+        viewState.showMainMenu(model.getMainMenu())
+    }
+
+    fun onClickMainPopMenu(itemId: Int): Boolean {
+        when (model.getMainMenuById(itemId)) {
+            INVENTORY -> model.createNewInventory()
+        }
+
+        return true
+    }
+
+    fun getFlowableListItem() = model.getFlowableListItem()
+
 }
+
+
+class Model {
+
+    @Inject
+    lateinit var interactorGetList: UseCaseGetListMetaObj
+
+    init {
+        App.appComponent.inject(this)
+    }
+
+    enum class MAIN_MENU(val title: String, val id: Int) {
+        LOAD("Загрузить", 1),
+        UNLOAD("Выгрузить базу в файл", 2),
+        INVENTORY("Инвентаризация паллеты", 3),
+        SETTINGS("Настройки", 4);
+    }
+
+    fun getMainMenuById(id: Int): MAIN_MENU? {
+        return when (id) {
+            1 -> return LOAD
+            2 -> return UNLOAD
+            3 -> return INVENTORY
+            4 -> return SETTINGS
+            else -> null
+        }
+    }
+
+    fun getMainMenu(): List<Pair<Int, String>> {
+        return listOf(
+            Pair(LOAD.id, LOAD.title),
+            Pair(INVENTORY.id, INVENTORY.title),
+            Pair(UNLOAD.id, UNLOAD.title),
+            Pair(SETTINGS.id, SETTINGS.title)
+        )
+
+    }
+
+    fun createNewInventory() {
+        var interactor = InteractorCreatorMetaObj(INVENTORY_PALLET)
+        var doc = interactor.create()
+        doc.date = Date()
+        doc.status = NEW
+        doc.description = "Инвентаризация"
+
+        doc.save()
+    }
+
+    fun getFlowableListItem() =
+        interactorGetList.get()
+            .map {
+                it.map {
+                    ItemList(
+                        info = "${it?.description} ${it?.getGuid() ?: ""}"
+                    )
+                }
+            }
+}
+
 
 
 

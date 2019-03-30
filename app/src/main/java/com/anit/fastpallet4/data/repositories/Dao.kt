@@ -15,25 +15,33 @@ import javax.inject.Inject
 class Dao {
 
     @Inject
-    lateinit var realm: Realm
+    lateinit var realmInitLocal: RealmInitLocal
+
+    //var realm:Realm
 
     @Inject
     lateinit var maping: Maping
 
     init {
        App.appComponent.inject(this)
+
     }
 
     fun save(metaObject: MetaObj) {
+        var realm = realmInitLocal.getLocalInstance()
         realm.executeTransaction {
             //Сохранили объект
-            realm.copyToRealmOrUpdate(maping.map(metaObject as CreatePallet))
+
+            var docRm =  maping.map(metaObject)
+
+            realm.copyToRealmOrUpdate(docRm)
             //Сохранили журнал
             realm.copyToRealmOrUpdate(maping.map(maping.mapToList(metaObject)))
         }
     }
 
     fun dell(metaObject: MetaObj) {
+        var realm = realmInitLocal.getLocalInstance()
         realm.executeTransaction {
 
             realm.where(DocumentRm::class.java)
@@ -49,6 +57,7 @@ class Dao {
     }
 
     fun getMetaObj(guid: String): MetaObj? {
+        var realm = realmInitLocal.getLocalInstance()
         var doc = realm.where(DocumentRm::class.java)
             .equalTo("guid", guid)
             .findFirst()
@@ -62,6 +71,7 @@ class Dao {
     }
 
     fun getFlowableList(): Flowable<List<ItemListMetaObj?>> {
+        var realm = realmInitLocal.getLocalInstance()
         return realm.where(ItemListRm::class.java)
             .findAll()
             .asFlowable()

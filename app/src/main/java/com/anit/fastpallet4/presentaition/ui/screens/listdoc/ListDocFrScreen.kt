@@ -1,18 +1,24 @@
 package com.anit.fastpallet4.presentaition.ui.screens.listdoc
 
 import android.os.Bundle
+import android.view.View
+import android.widget.PopupMenu
+import android.widget.TextView
 import com.anit.fastpallet4.R
 import com.anit.fastpallet4.navigation.RouterProvider
 import com.anit.fastpallet4.presentaition.presenter.ListDocPresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseFragment
+import com.anit.fastpallet4.presentaition.ui.base.BaseListFragment
 import com.anit.fastpallet4.presentaition.ui.base.BaseView
+import com.anit.fastpallet4.presentaition.ui.base.MyListFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
+import kotlinx.android.synthetic.main.fr_list_doc_scr.*
 
 import java.io.Serializable
 
 
-class ListDocFrScreen : BaseFragment(), BaseView {
+class ListDocFrScreen : BaseFragment(), ListDocView {
 
     class InputParamObj() : Serializable
 
@@ -30,7 +36,6 @@ class ListDocFrScreen : BaseFragment(), BaseView {
         }
     }
 
-
     @InjectPresenter
     lateinit var presenter: ListDocPresenter
 
@@ -46,4 +51,34 @@ class ListDocFrScreen : BaseFragment(), BaseView {
     override fun onBackPressed() = presenter.onBackPressed()
 
 
+    override fun onStart() {
+        super.onStart()
+
+        var listFrag = MyListFragment.newInstance(presenter.getFlowableListItem())
+
+        var transaction = getFragmentTransaction()
+        transaction.replace(R.id.conteiner_frame_list, listFrag)
+        transaction.commit()
+
+        tv_menu.setOnClickListener {
+            presenter.onClickMainMenu()
+        }
+    }
+
+    override fun showMainMenu(listmenu: List<Pair<Int, String>>) {
+        var popupMenu = PopupMenu(activity, tv_menu)
+        listmenu.forEach {
+            popupMenu.menu.add(0, it.first, 0, it.second)
+        }
+
+        popupMenu.setOnMenuItemClickListener {
+            presenter.onClickMainPopMenu(it.itemId)
+        }
+
+        popupMenu.show()
+
+    }
+
 }
+
+

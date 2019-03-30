@@ -41,6 +41,7 @@ abstract class MetaObj(){
         if (isNew()) {
             guid = UUID.randomUUID().toString()
         }
+        dataChanged = Date()
         manager.save()
     }
 
@@ -49,7 +50,7 @@ abstract class MetaObj(){
     }
 
     fun isNew(): Boolean {
-        return !guid.isNullOrEmpty()
+        return guid.isNullOrEmpty()
     }
 }
 
