@@ -1,4 +1,4 @@
-package com.anit.fastpallet4.navigation
+package com.anit.fastpallet4.presentaition.navigation
 
 import ru.terrakok.cicerone.Router
 

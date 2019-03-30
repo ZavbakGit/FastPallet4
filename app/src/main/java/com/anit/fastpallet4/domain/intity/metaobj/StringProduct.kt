@@ -4,7 +4,7 @@ import kotlinx.serialization.ContextualSerialization
 import kotlinx.serialization.Serializable
 import java.util.*
 
-@Serializable
+
 class StringProduct {
 
     var number: String? = null

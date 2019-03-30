@@ -45,11 +45,11 @@ class Dao {
         realm.executeTransaction {
 
             realm.where(DocumentRm::class.java)
-                .equalTo("guid", metaObject.getGuid())
+                .equalTo("guid", metaObject.guid)
                 .findAll().deleteAllFromRealm()
 
             realm.where(ItemListRm::class.java)
-                .equalTo("guid", metaObject.getGuid())
+                .equalTo("guid", metaObject.guid)
                 .findAll().deleteAllFromRealm()
 
 

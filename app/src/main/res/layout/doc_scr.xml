@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/header_doc"
+            android:layout_alignParentTop="true"
+            android:focusable="true"
+            android:clickable="true">
+
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:id="@+id/footer">
+            <TextView
+                    android:padding="8dp"
+                    android:id="@+id/tv_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Описание"
+                    android:maxLines="2"/>
+
+            <TextView
+                    android:text="Документ"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tv_info__doc_left"
+                    android:layout_below="@+id/tv_info"
+            />
+
+            <TextView
+                    android:text="Документ"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tv_info_doc_right"
+                    android:layout_below="@+id/tv_info"
+                    android:layout_alignParentRight="true"
+            />
+
+
+        </RelativeLayout>
+
+
+    </FrameLayout>
+
+
+    <FrameLayout
+            android:layout_below="@+id/header_doc"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/conteiner_frame_list"
+            android:layout_alignParentBottom="true">
+    </FrameLayout>
+
+
+</RelativeLayout>

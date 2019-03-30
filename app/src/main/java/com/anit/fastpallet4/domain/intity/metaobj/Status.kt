@@ -1,5 +1,6 @@
 package com.anit.fastpallet4.domain.intity.metaobj
 
+
 enum class Status(val id: Int, val fullName: String) {
     NEW(1, "Новый"), READY(2, "Подготовлен"),
     LOADED(3, "Выгружен"), UNLOADED(4, "Загружен");

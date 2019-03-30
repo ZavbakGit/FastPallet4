@@ -1,7 +1,7 @@
 package com.anit.fastpallet4.presentaition.ui.base
 
 
-import com.anit.fastpallet4.navigation.BackButtonListener
+import com.anit.fastpallet4.presentaition.navigation.BackButtonListener
 import com.anit.fastpallet4.presentaition.navigation.Screens
 import com.arellomobile.mvp.MvpPresenter
 import com.arellomobile.mvp.MvpView

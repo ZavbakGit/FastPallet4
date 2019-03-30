@@ -5,48 +5,54 @@ import com.anit.fastpallet4.domain.intity.metaobj.Status
 import com.anit.fastpallet4.domain.intity.metaobj.Status.*
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseMetaObj
 import com.anit.fastpallet4.domain.usecase.UseCaseMetaObj
+import kotlinx.serialization.Transient
 import java.util.*
 
 
 
 abstract class MetaObj(){
 
-    private var guid: String? = null
-    private var guidServer: String? = null
+    var guid: String? = null
+    var guidServer: String? = null
     var type: Type? = null
-
 
     var status: Status = NEW
     var number: String? = null
+
+
     var date: Date? = null
+
+
     var dataChanged: Date? = null
+
     var isWasLoadedLastTime: Boolean? = false
     var description: String? = null
     var barcode: String? = null
 
-    private val manager: UseCaseMetaObj
+
+
+    //private var useCaseMetaObj: UseCaseMetaObj? = null
 
     constructor(type: Type):this(){
         this.type = type
     }
 
     init {
-        manager = InteractorUseCaseMetaObj(this)
+        //useCaseMetaObj = InteractorUseCaseMetaObj(this)
     }
 
-    fun getGuid() = guid
-    fun getGuidServer() = guidServer
-
     open fun save() {
+        var useCaseMetaObj = InteractorUseCaseMetaObj(this)
         if (isNew()) {
             guid = UUID.randomUUID().toString()
         }
         dataChanged = Date()
-        manager.save()
+        useCaseMetaObj!!.save()
     }
 
     open fun dell() {
-        manager.dell()
+        var useCaseMetaObj: UseCaseMetaObj = InteractorUseCaseMetaObj(this)
+        useCaseMetaObj!!.dell()
     }
 
     fun isNew(): Boolean {

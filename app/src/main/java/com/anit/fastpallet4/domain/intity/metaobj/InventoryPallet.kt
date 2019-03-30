@@ -1,11 +1,10 @@
 package com.anit.fastpallet4.domain.intity.metaobj
 
 import com.anit.fastpallet4.domain.intity.MetaObj
-import com.anit.fastpallet4.domain.intity.Type
 import com.anit.fastpallet4.domain.intity.Type.*
 import kotlinx.serialization.Serializable
 
-@Serializable
+
 class InventoryPallet : MetaObj(type = INVENTORY_PALLET) {
 
     var barcodePallet: String? = null

@@ -3,11 +3,9 @@ package com.anit.fastpallet4.presentaition.ui.base
 import android.os.Bundle
 import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.data.repositories.RealmInitLocal
-import com.anit.fastpallet4.navigation.BackButtonListener
-import com.anit.fastpallet4.navigation.RouterProvider
-import com.anit.fastpallet4.presentaition.ui.util.showMessage
+import com.anit.fastpallet4.presentaition.navigation.BackButtonListener
+import com.anit.fastpallet4.presentaition.navigation.RouterProvider
 import com.arellomobile.mvp.MvpAppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router

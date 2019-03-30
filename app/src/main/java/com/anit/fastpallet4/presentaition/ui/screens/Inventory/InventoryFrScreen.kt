@@ -1,89 +1,82 @@
-package com.anit.fastpallet4.presentaition.ui.screens.listdoc
+package com.anit.fastpallet4.presentaition.ui.screens.Inventory
+
 
 import android.os.Bundle
-import android.widget.PopupMenu
 import com.anit.fastpallet4.R
 import com.anit.fastpallet4.presentaition.navigation.RouterProvider
-import com.anit.fastpallet4.presentaition.presenter.ListDocPresenter
+import com.anit.fastpallet4.presentaition.presenter.Inventory.InventoryPresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseFragment
+import com.anit.fastpallet4.presentaition.ui.base.BaseView
 import com.anit.fastpallet4.presentaition.ui.base.MyListFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
-import kotlinx.android.synthetic.main.fr_list_doc_scr.*
-
+import kotlinx.android.synthetic.main.doc_scr.*
 import java.io.Serializable
 
+class InventoryFrScreen : BaseFragment(), BaseView {
 
-class ListDocFrScreen : BaseFragment(), ListDocView {
-
-    class InputParamObj() : Serializable
+    class InputParamObj(val guid: String) : Serializable
 
     var inputParamObj: Serializable? = null
 
     companion object {
 
         val PARAM_KEY = "param"
-        fun newInstance(inputParam: InputParamObj? = null): ListDocFrScreen {
+        fun newInstance(inputParam: InputParamObj? = null): InventoryFrScreen {
             val bundle: Bundle = Bundle()
             bundle.putSerializable(PARAM_KEY, inputParam)
-            var fragment = ListDocFrScreen()
+            var fragment = InventoryFrScreen()
             fragment.arguments = bundle
             return fragment
         }
     }
 
     @InjectPresenter
-    lateinit var presenter: ListDocPresenter
+    lateinit var presenter: InventoryPresenter
 
     @ProvidePresenter
-    fun providePresenter() = ListDocPresenter(
+    fun providePresenter() = InventoryPresenter(
         router = (activity as RouterProvider).getRouter(),
         inputParamObj = arguments?.getSerializable(PARAM_KEY) as? InputParamObj
     )
 
 
-
-    override fun getLayout() = R.layout.fr_list_doc_scr
+    override fun getLayout() = R.layout.doc_scr
     override fun onBackPressed() = presenter.onBackPressed()
 
 
     override fun onStart() {
         super.onStart()
 
-        var listFrag = MyListFragment.newInstance(presenter.getFlowableListItem())
+        var listFrag = MyListFragment.newInstance(presenter.getViewModelFlowable()
+            .map {
+                it.list
+            })
+
+        bagDisposable.add(
+            presenter.getViewModelFlowable()
+                .subscribe {
+                    tv_info.text = it.info
+                }
+        )
+
 
         var transaction = getFragmentTransaction()
         transaction.replace(R.id.conteiner_frame_list, listFrag)
         transaction.commit()
 
-
         bagDisposable.add(
             listFrag.publishSubjectItemClick
-                .subscribe {
-                    presenter.onClickItem(listFrag.getList().get(it).identifier!!)
+                .subscribe{
+                    presenter.onClickItem(it)
                 }
-
         )
 
-        tv_menu.setOnClickListener {
-            presenter.onClickMainMenu()
-        }
-    }
-
-    override fun showMainMenu(listmenu: List<Pair<Int, String>>) {
-        var popupMenu = PopupMenu(activity, tv_menu)
-        listmenu.forEach {
-            popupMenu.menu.add(0, it.first, 0, it.second)
+        tv_info.setOnClickListener {
+            presenter.readBarcode("10.1")
         }
 
-        popupMenu.setOnMenuItemClickListener {
-            presenter.onClickMainPopMenu(it.itemId)
-        }
-
-        popupMenu.show()
 
     }
 
 }
-
-

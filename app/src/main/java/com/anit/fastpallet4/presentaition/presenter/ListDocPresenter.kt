@@ -8,6 +8,7 @@ import com.anit.fastpallet4.domain.usecase.interactor.InteractorCreatorMetaObj
 import com.anit.fastpallet4.presentaition.presenter.Model.MAIN_MENU.*
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
+import com.anit.fastpallet4.presentaition.ui.screens.Inventory.InventoryFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocView
 import com.arellomobile.mvp.InjectViewState
@@ -25,10 +26,16 @@ class ListDocPresenter(
 
     val model = Model()
 
+    init {
+        App.appComponent.inject(this)
+    }
+
     override fun onBackPressed(): Boolean {
         router.exit()
         return true
     }
+
+    fun getFlowableListItem() = model.getFlowableListItem()
 
     fun onClickMainMenu() {
         viewState.showMainMenu(model.getMainMenu())
@@ -38,11 +45,14 @@ class ListDocPresenter(
         when (model.getMainMenuById(itemId)) {
             INVENTORY -> model.createNewInventory()
         }
-
         return true
     }
 
-    fun getFlowableListItem() = model.getFlowableListItem()
+    fun onClickItem(guid: String) {
+        router.navigateTo(
+            screens.getInventoryScreen(InventoryFrScreen.InputParamObj(guid = guid))
+        )
+    }
 
 }
 
@@ -98,7 +108,9 @@ class Model {
             .map {
                 it.map {
                     ItemList(
+                        identifier = it!!.getGuid(),
                         info = "${it?.description} ${it?.getGuid() ?: ""}"
+
                     )
                 }
             }

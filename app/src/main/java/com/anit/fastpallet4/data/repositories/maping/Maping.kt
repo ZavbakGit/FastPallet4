@@ -1,33 +1,50 @@
 package com.anit.fastpallet4.data.repositories.maping
 
-import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
+import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.data.db.intity.DocumentRm
 import com.anit.fastpallet4.data.db.intity.ItemListRm
-import com.anit.fastpallet4.domain.intity.Type
 import com.anit.fastpallet4.domain.intity.MetaObj
-import com.anit.fastpallet4.domain.intity.Type.*
+import com.anit.fastpallet4.domain.intity.Type
+import com.anit.fastpallet4.domain.intity.Type.CREATE_PALLET
+import com.anit.fastpallet4.domain.intity.Type.INVENTORY_PALLET
 import com.anit.fastpallet4.domain.intity.listmetaobj.ItemListMetaObj
+import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
 import com.anit.fastpallet4.domain.intity.metaobj.InventoryPallet
 import com.anit.fastpallet4.domain.intity.metaobj.Status
-import kotlinx.serialization.json.Json
+import com.google.gson.Gson
+import javax.inject.Inject
 
 class Maping {
+
+    @Inject
+    lateinit var gson: Gson
+
+    init {
+        App.appComponent.inject(this)
+    }
+
+
     fun map(doc: MetaObj): DocumentRm {
+        var data = gson.toJson(doc)
+
+//        var data = when (doc.type) {
+//            CREATE_PALLET -> mapCreatPlletToStr(doc as CreatePallet)
+//            INVENTORY_PALLET -> mapInventoryPalletToStr(doc as InventoryPallet)
+//            else->null
+//        }
+
+
         return DocumentRm(
-            guid = doc.getGuid(),
-            guidServer = doc.getGuidServer(),
+            guid = doc.guid,
+            guidServer = doc.guidServer,
             typeDoc = doc.type!!.id,
-            data = when (doc.type) {
-                CREATE_PALLET -> mapCreatPlletToStr(doc as CreatePallet)
-                INVENTORY_PALLET -> mapInventoryPalletToStr(doc as InventoryPallet)
-                else-> null
-            }
+            data = data
         )
 
     }
 
     fun map(doc: DocumentRm): MetaObj? {
-        return when (Type.getTypeById(1)) {
+        return when (Type.getTypeById(doc.typeDoc!!)) {
             CREATE_PALLET -> mapCreatePallet(doc)
             INVENTORY_PALLET -> mapCreateInventory(doc)
             else -> null
@@ -66,10 +83,10 @@ class Maping {
 
     }
 
-    fun mapToList(doc:MetaObj):ItemListMetaObj{
-       return ItemListMetaObj(
-            guid = doc.getGuid(),
-            guidServer = doc.getGuidServer(),
+    fun mapToList(doc: MetaObj): ItemListMetaObj {
+        return ItemListMetaObj(
+            guid = doc.guid,
+            guidServer = doc.guidServer,
             type = doc.type!!,
             date = doc.date,
             status = doc.status,
@@ -82,19 +99,24 @@ class Maping {
     }
 
     private fun mapCreatPlletToStr(doc: CreatePallet): String {
-        return Json.stringify(CreatePallet.serializer(), doc)
+        //return Json.stringify(CreatePallet.serializer(), doc)
+        return gson.toJson(doc)
     }
 
     private fun mapInventoryPalletToStr(doc: InventoryPallet): String {
-        return Json.stringify(InventoryPallet.serializer(), doc)
+        //return Json.stringify(InventoryPallet.serializer(), doc)
+        return gson.toJson(doc)
     }
 
     private fun mapCreatePallet(doc: DocumentRm): CreatePallet {
-        return Json.parse(CreatePallet.serializer(), doc.data ?: "")
+        //return Json.parse(CreatePallet.serializer(), doc.data ?: "")
+        return gson.fromJson(doc.data, CreatePallet::class.java)
+
     }
 
     private fun mapCreateInventory(doc: DocumentRm): InventoryPallet {
-        return Json.parse(InventoryPallet.serializer(), doc.data ?: "")
+        //return Json.parse(InventoryPallet.serializer(), doc.data ?: "")
+        return gson.fromJson(doc.data, InventoryPallet::class.java)
     }
 }
 

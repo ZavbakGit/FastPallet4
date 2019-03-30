@@ -1,8 +1,7 @@
-package com.anit.fastpallet4.navigation
+package com.anit.fastpallet4.presentaition.navigation
 
 
 
-import com.anit.fastpallet4.presentaition.navigation.Screens
 import dagger.Module
 import dagger.Provides
 import ru.terrakok.cicerone.Cicerone

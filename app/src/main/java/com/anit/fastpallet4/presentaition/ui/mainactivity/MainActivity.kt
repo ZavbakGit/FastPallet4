@@ -2,7 +2,7 @@ package com.anit.fastpallet4.presentaition.ui.mainactivity
 
 
 import com.anit.fastpallet4.R
-import com.anit.fastpallet4.navigation.RouterProvider
+import com.anit.fastpallet4.presentaition.navigation.RouterProvider
 import com.anit.fastpallet4.presentaition.presenter.MainPresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseActivity
 import com.anit.fastpallet4.presentaition.ui.base.BaseView

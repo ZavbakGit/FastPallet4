@@ -1,11 +1,10 @@
 package com.anit.fastpallet4.presentaition.ui.base
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.anit.fastpallet4.navigation.BackButtonListener
+import com.anit.fastpallet4.presentaition.navigation.BackButtonListener
 import com.anit.fastpallet4.presentaition.ui.util.showMessage
 import com.arellomobile.mvp.MvpAppCompatFragment
 import io.reactivex.disposables.CompositeDisposable
