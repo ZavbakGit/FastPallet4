@@ -6,9 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v7.app.AlertDialog
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
 import com.anit.fastpallet4.R
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCreatePalletFrScreen
@@ -43,9 +40,6 @@ class ProductDialogFr : DialogFragment() {
     var ed_start: EditText? = null
     var ed_end: EditText? = null
     var ed_coff: EditText? = null
-
-
-
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
