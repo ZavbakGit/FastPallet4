@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:orientation="vertical">
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+
+                <android.support.design.widget.TextInputLayout
+                        android:layout_margin="8dp"
+                        android:id="@+id/til_barcode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true">
+
+                    <android.support.design.widget.TextInputEditText
+                            android:focusable="false"
+                            android:id="@+id/ed_barcode"
+                            android:hint="Штрихкод"
+                            android:inputType="number"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                        android:id="@+id/till_start"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/til_barcode"
+                        android:layout_margin="8dp"
+
+                >
+
+                    <android.support.design.widget.TextInputEditText
+                            android:id="@+id/ed_start"
+                            android:inputType="number"
+                            android:layout_width="match_parent"
+                            android:ems="4"
+                            android:layout_height="wrap_content"
+                            android:hint="Начало"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                        android:id="@+id/till_end"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/till_start"
+                        android:layout_margin="8dp"
+                >
+
+                    <android.support.design.widget.TextInputEditText
+                            android:ems="4"
+                            android:inputType="number"
+                            android:id="@+id/ed_end"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Конец"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                        android:id="@+id/till_coff"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/till_end"
+                        android:layout_margin="8dp"
+                >
+
+                    <android.support.design.widget.TextInputEditText
+                            android:id="@+id/ed_coff"
+                            android:ems="4"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal"
+                            android:hint="Коэффицент"/>
+                </android.support.design.widget.TextInputLayout>
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+</RelativeLayout>

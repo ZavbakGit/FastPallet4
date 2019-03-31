@@ -1,6 +1,6 @@
 package com.anit.fastpallet4.presentaition.navigation
 
-import com.anit.fastpallet4.presentaition.ui.screens.Inventory.InventoryFrScreen
+import com.anit.fastpallet4.presentaition.ui.screens.inventory.InventoryFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.doc.CreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.product.ProductCreatePalletFrScreen

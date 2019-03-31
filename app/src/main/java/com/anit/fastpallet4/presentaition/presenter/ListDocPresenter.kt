@@ -12,7 +12,7 @@ import com.anit.fastpallet4.domain.usecase.interactor.InteractorCreatorMetaObj
 import com.anit.fastpallet4.presentaition.presenter.Model.MAIN_MENU.*
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
-import com.anit.fastpallet4.presentaition.ui.screens.Inventory.InventoryFrScreen
+import com.anit.fastpallet4.presentaition.ui.screens.inventory.InventoryFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.doc.CreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocView
@@ -140,11 +140,11 @@ class Model {
 
     fun getFlowableListItem() =
         interactorGetList.get()
-            .map {
+            .map { it ->
                 it.map {
                     ItemList(
                         identifier = it!!.getGuid(),
-                        info = "${it?.description} ${it?.getGuid() ?: ""}",
+                        info = "${it.description} ${it.getGuid() ?: ""}",
                         type = it.type.id
 
                     )

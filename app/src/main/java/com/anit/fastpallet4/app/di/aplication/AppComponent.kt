@@ -45,7 +45,7 @@ interface AppComponent {
     fun inject(mainPresenter: MainPresenter)
     fun inject(model: Model)
     fun inject(listDocPresenter: ListDocPresenter)
-    fun inject(model: com.anit.fastpallet4.presentaition.presenter.Inventory.Model)
+    fun inject(model: com.anit.fastpallet4.presentaition.presenter.inventory.Model)
     fun inject(maping: Maping)
     fun inject(model: com.anit.fastpallet4.presentaition.presenter.createpallet.doc.Model)
     fun inject(model: com.anit.fastpallet4.presentaition.presenter.createpallet.product.Model)

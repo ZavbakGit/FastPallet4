@@ -1,4 +1,4 @@
-package com.anit.fastpallet4.presentaition.presenter.Inventory
+package com.anit.fastpallet4.presentaition.presenter.inventory
 
 
 import com.anit.fastpallet4.app.App
@@ -6,9 +6,9 @@ import com.anit.fastpallet4.domain.intity.metaobj.Box
 import com.anit.fastpallet4.domain.intity.metaobj.InventoryPallet
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
-import com.anit.fastpallet4.presentaition.ui.base.BaseView
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
-import com.anit.fastpallet4.presentaition.ui.screens.Inventory.InventoryFrScreen
+import com.anit.fastpallet4.presentaition.ui.screens.inventory.InventoryFrScreen
+import com.anit.fastpallet4.presentaition.ui.screens.inventory.InventoryView
 import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
@@ -20,7 +20,7 @@ class InventoryPresenter(
     router: Router,
     private val inputParamObj: InventoryFrScreen.InputParamObj?
 
-) : BasePresenter<BaseView>(router) {
+) : BasePresenter<InventoryView>(router) {
 
     private val model = Model(inputParamObj!!.guid)
 
@@ -41,6 +41,33 @@ class InventoryPresenter(
             model.dellBarcode(index!!)
         }
     }
+
+    fun onClickInfo() {
+        var doc = model.doc
+        viewState.showDialogProduct(
+            title = doc.guid ?: "",
+            weightStartProduct = doc.stringProduct.weightStartProduct,
+            weightEndProduct = doc.stringProduct.weightEndProduct,
+            weightCoffProduct = doc.stringProduct.weightCoffProduct,
+            barcode = doc.stringProduct.barcode
+        )
+    }
+
+    fun saveProduct(
+        barcode: String?
+        , weightStartProduct: Int
+        , weightEndProduct: Int
+        , weightCoffProduct: Float
+    ) {
+        model.saveProduct(
+            barcode = barcode,
+            weightStartProduct = weightStartProduct,
+            weightEndProduct = weightEndProduct,
+            weightCoffProduct = weightCoffProduct
+        )
+
+    }
+
 
 }
 
@@ -79,10 +106,26 @@ class Model(guid: String) {
         refreshViewModel()
     }
 
-    fun dellBarcode(index:Int){
+    fun dellBarcode(index: Int) {
         doc.dellBox(index)
         doc.save()
         refreshViewModel()
+    }
+
+    fun saveProduct(
+        barcode: String?
+        , weightStartProduct: Int
+        , weightEndProduct: Int
+        , weightCoffProduct: Float
+    ) {
+
+        doc.stringProduct.barcode = barcode
+        doc.stringProduct.weightStartProduct = weightStartProduct
+        doc.stringProduct.weightEndProduct = weightEndProduct
+        doc.stringProduct.weightCoffProduct = weightCoffProduct
+        doc.save()
+        refreshViewModel()
+
     }
 }
 
