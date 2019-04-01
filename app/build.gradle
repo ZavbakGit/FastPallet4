@@ -11,6 +11,12 @@ apply plugin: 'kotlinx-serialization'
 
 android {
     compileSdkVersion 28
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
         applicationId "com.anit.fastpallet4"
         minSdkVersion 15
@@ -40,6 +46,9 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.3.0'
 
+    implementation "com.jakewharton.rxbinding2:rxbinding:2.2.0"
+    implementation "com.jakewharton.rxbinding2:rxbinding-kotlin:2.2.0"
+
 
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
@@ -67,4 +76,7 @@ dependencies {
     implementation 'ru.terrakok.cicerone:cicerone:4.0.2'
 
     implementation 'com.google.code.gson:gson:2.8.5'
+
+
+    implementation project(path: ':barcode')
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.gladkikh.mylibrary">
+
+    <application>
+        <service
+                android:name=".BrodcastService"
+                android:enabled="true"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="com.motorolasolutions.emdk.sample.dwdemosample.RECVR"/>
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>

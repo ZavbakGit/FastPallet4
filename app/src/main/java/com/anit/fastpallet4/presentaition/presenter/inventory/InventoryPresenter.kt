@@ -5,6 +5,7 @@ import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.domain.intity.metaobj.Box
 import com.anit.fastpallet4.domain.intity.metaobj.InventoryPallet
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
+import com.anit.fastpallet4.domain.utils.getWeightByBarcode
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
 import com.anit.fastpallet4.presentaition.ui.screens.inventory.InventoryFrScreen
@@ -13,6 +14,7 @@ import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
 import ru.terrakok.cicerone.Router
+import java.util.*
 import javax.inject.Inject
 
 @InjectViewState
@@ -24,6 +26,8 @@ class InventoryPresenter(
 
     private val model = Model(inputParamObj!!.guid)
 
+    var isShowDialog = false
+
     override fun onBackPressed(): Boolean {
         router.exit()
         return true
@@ -32,14 +36,35 @@ class InventoryPresenter(
     fun getViewModelFlowable() = model.behaviorSubjectViewModel
         .toFlowable(BackpressureStrategy.BUFFER)
 
-    fun readBarcode(barcode: String) {
-        model.addBarcode(barcode)
+    fun readBarcode(barcode: String?) {
+        barcode.let {
+            var weight = getWeightByBarcode(
+                barcode = it!!,
+                start = model.doc.stringProduct.weightStartProduct,
+                finish = model.doc.stringProduct.weightEndProduct,
+                coff = model.doc.stringProduct.edCoff
+            )
+
+            if (weight == 0f) {
+                viewState.showSnackbarViewError("Не верный вес!")
+            } else if (it.length != model.doc.stringProduct.barcode?.length) {
+                viewState.showSnackbarViewError("Не верная длинна штрихкода!")
+            } else {
+                model.addBox(weight, it)
+            }
+        }
+
     }
 
     fun onClickItem(index: Int?) {
-        index.let {
-            model.dellBarcode(index!!)
-        }
+        viewState.showDialogBox(
+            title = model.doc?.stringProduct?.nameProduct ?: "",
+            weight = model.getBox(index!!).weight,
+            date = model.getBox(index!!).data ?: Date(),
+            barcode = model.getBox(index!!).barcode,
+            index = index
+
+        )
     }
 
     fun onClickInfo() {
@@ -68,6 +93,19 @@ class InventoryPresenter(
 
     }
 
+    fun saveBox(barcode: String?, weight: Float, index: Int?) {
+        if(weight == 0f){
+            viewState.showSnackbarViewError("Не верный вес!")
+        }else{
+            model.saveBox(
+                index = index,
+                barcode = barcode,
+                weight = weight
+            )
+        }
+
+
+    }
 
 }
 
@@ -98,9 +136,13 @@ class Model(guid: String) {
         )
     }
 
-    fun addBarcode(barcode: String) {
+    fun addBox(weight: Float, barcode: String?) {
         var box = Box()
-        box.weight = barcode.toFloatOrNull() ?: 0f
+
+        box.barcode = barcode
+        box.data = Date()
+        box.weight = weight
+
         doc.addBox(box)
         doc.save()
         refreshViewModel()
@@ -108,6 +150,27 @@ class Model(guid: String) {
 
     fun dellBarcode(index: Int) {
         doc.dellBox(index)
+        doc.save()
+        refreshViewModel()
+    }
+
+    fun getBox(index: Int): Box {
+        return doc.getBox(index)
+    }
+
+    fun saveBox(index: Int?, weight: Float, barcode: String?) {
+        var box:Box?
+        if (index != null){
+            box = getBox(index)
+        }else{
+            box = Box()
+            doc.addBox(box)
+        }
+
+        box.barcode = barcode
+        box.data = Date()
+        box.weight = weight
+
         doc.save()
         refreshViewModel()
     }

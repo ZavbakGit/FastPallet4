@@ -1,6 +1,7 @@
 package com.anit.fastpallet4.presentaition.ui.screens.inventory
 
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.anit.fastpallet4.R
@@ -9,18 +10,25 @@ import com.anit.fastpallet4.presentaition.navigation.RouterProvider
 import com.anit.fastpallet4.presentaition.presenter.inventory.InventoryPresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseFragment
 import com.anit.fastpallet4.presentaition.ui.base.MyListFragment
+import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
+import com.anit.fastpallet4.presentaition.ui.screens.dialogbox.BoxDialogFr
 import com.anit.fastpallet4.presentaition.ui.screens.dialogproduct.ProductDialogFr
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import kotlinx.android.synthetic.main.doc_scr.*
 import java.io.Serializable
+import java.util.*
 
 
 class InventoryFrScreen : BaseFragment(), InventoryView {
 
+
     class InputParamObj(val guid: String) : Serializable
 
     var inputParamObj: Serializable? = null
+
+    var REQEST_CODE_PRODUCT_DIALOG = 1
+    var REQEST_CODE_BOX_DIALOG = 2
 
     companion object {
 
@@ -38,6 +46,7 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
     lateinit var presenter: InventoryPresenter
 
     var dialogProduct: ProductDialogFr? = null
+    var dialogBox: BoxDialogFr? = null
 
     @ProvidePresenter
     fun providePresenter() = InventoryPresenter(
@@ -48,8 +57,6 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
 
     override fun getLayout() = R.layout.doc_scr
     override fun onBackPressed() = presenter.onBackPressed()
-
-
     override fun onStart() {
         super.onStart()
 
@@ -78,7 +85,12 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
         )
 
 
-
+        bagDisposable.add((activity as MainActivity).getFlowableBarcode()
+            .subscribe {
+                if (!presenter.isShowDialog) {
+                    presenter.readBarcode(it)
+                }
+            })
 
         tv_info.setOnClickListener {
             presenter.onClickInfo()
@@ -86,6 +98,50 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
 
 
     }
+
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQEST_CODE_PRODUCT_DIALOG) {
+
+            if (resultCode == Activity.RESULT_OK) {
+                var param = data?.getSerializableExtra(ProductDialogFr.PARAM_KEY)
+                        as? ProductDialogFr.InputParamObj
+
+                param.let {
+                    presenter.saveProduct(
+                        barcode = param?.barcode,
+                        weightStartProduct = param?.weightStartProduct ?: 0,
+                        weightEndProduct = param?.weightEndProduct ?: 0,
+                        weightCoffProduct = param?.weightCoffProduct ?: 0f
+                    )
+                }
+            }
+
+        }
+
+        if (requestCode == REQEST_CODE_BOX_DIALOG) {
+
+            if (resultCode == Activity.RESULT_OK) {
+                var param = data?.getSerializableExtra(BoxDialogFr.PARAM_KEY)
+                        as? BoxDialogFr.InputParamObj
+
+                param.let {
+                    presenter.saveBox(
+                        barcode = param?.barcode,
+                        weight = param?.weight ?: 0f,
+                        index = param?.index
+                    )
+                }
+            }
+
+        }
+
+        presenter.isShowDialog = false
+    }
+
 
     override fun showDialogProduct(
         title: String
@@ -96,15 +152,8 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
 
     ) {
 
-        if (dialogProduct != null
-            && dialogProduct!!.dialog != null
-            && dialogProduct!!.dialog.isShowing
-            && !dialogProduct!!.isRemoving
-        ) {
-            //dialog is showing so do something
-        } else {
-            //dialog is not showing
 
+        if (!presenter.isShowDialog) {
             dialogProduct = ProductDialogFr.newInstance(
                 ProductDialogFr.InputParamObj(
                     title = title,
@@ -115,27 +164,32 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
                 )
             )
             val transaction = fragmentManager!!.beginTransaction()
-            dialogProduct!!.setTargetFragment(this, 8)
+            dialogProduct!!.setTargetFragment(this, REQEST_CODE_PRODUCT_DIALOG)
             dialogProduct!!.show(transaction, ProductDialogFr.TAG)
+
+            presenter.isShowDialog = true
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        var param = data?.getSerializableExtra(ProductDialogFr.PARAM_KEY)
-                as? ProductDialogFr.InputParamObj
-
-        param.let {
-            presenter.saveProduct(
-                barcode = param?.barcode,
-                weightStartProduct = param?.weightStartProduct ?: 0,
-                weightEndProduct = param?.weightEndProduct ?: 0,
-                weightCoffProduct = param?.weightCoffProduct ?: 0f
+    override fun showDialogBox(title: String, barcode: String?, weight: Float, date: Date,index:Int?) {
+        if (!presenter.isShowDialog) {
+            dialogBox = BoxDialogFr.newInstance(
+                BoxDialogFr.InputParamObj(
+                    title = title,
+                    barcode = barcode,
+                    weight = weight,
+                    date = date,
+                    index = index
+                )
             )
+            val transaction = fragmentManager!!.beginTransaction()
+            dialogBox!!.setTargetFragment(this, REQEST_CODE_BOX_DIALOG)
+            dialogBox!!.show(transaction, ProductDialogFr.TAG)
+
+            presenter.isShowDialog = true
         }
-
-
     }
+
+
 
 }

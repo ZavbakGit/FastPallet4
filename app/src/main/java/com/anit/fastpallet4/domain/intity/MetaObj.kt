@@ -11,7 +11,6 @@ import java.util.*
 
 
 abstract class MetaObj(){
-
     var guid: String? = null
     var guidServer: String? = null
     var type: Type? = null

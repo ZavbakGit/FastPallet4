@@ -20,6 +20,10 @@ class InventoryPallet : MetaObj(type = INVENTORY_PALLET) {
         stringProduct.boxes.removeAt(index)
     }
 
+    fun getBox(index:Int):Box{
+      return  stringProduct.boxes.get(index)
+    }
+
 }
 
 

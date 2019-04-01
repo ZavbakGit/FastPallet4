@@ -6,5 +6,8 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
 
 interface BaseView:MvpView {
     @StateStrategyType(SkipStrategy::class)
-    fun showSnackbarView(messager: CharSequence)
+    fun showSnackbarViewMess(messager: CharSequence)
+
+    @StateStrategyType(SkipStrategy::class)
+    fun showSnackbarViewError(messager: CharSequence)
 }

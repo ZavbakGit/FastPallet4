@@ -7,8 +7,19 @@ import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v7.app.AlertDialog
 import android.widget.EditText
+import android.widget.TextView
 import com.anit.fastpallet4.R
+import com.anit.fastpallet4.domain.utils.getWeightByBarcode
+import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCreatePalletFrScreen
+import com.anit.fastpallet4.presentaition.ui.util.edTextChangesToFlowable
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.Flowables
+import io.reactivex.rxkotlin.combineLatest
+import kotlinx.android.synthetic.main.dialog_product_scr.*
 import java.io.Serializable
 
 
@@ -40,7 +51,10 @@ class ProductDialogFr : DialogFragment() {
     var ed_start: EditText? = null
     var ed_end: EditText? = null
     var ed_coff: EditText? = null
+    var ed_weight: EditText? = null
 
+
+    protected val bagDisposable = CompositeDisposable()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         inputParamObj = arguments?.getSerializable(PalletCreatePalletFrScreen.PARAM_KEY)
@@ -71,7 +85,12 @@ class ProductDialogFr : DialogFragment() {
             }
             .setNegativeButton(
                 "Cancel"
-            ) { dialog, whichButton -> dialog.dismiss() }
+            ) { dialog, whichButton ->
+
+                targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_CANCELED, null)
+
+                dialog.dismiss()
+            }
 
         val i = activity!!.layoutInflater
 
@@ -81,6 +100,7 @@ class ProductDialogFr : DialogFragment() {
         ed_start = v.findViewById(R.id.ed_start) as EditText
         ed_end = v.findViewById(R.id.ed_end) as EditText
         ed_coff = v.findViewById(R.id.ed_coff) as EditText
+        ed_weight = v.findViewById(R.id.ed_weight) as EditText
 
 
 
@@ -101,5 +121,67 @@ class ProductDialogFr : DialogFragment() {
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        bagDisposable.add((activity as MainActivity).getFlowableBarcode()
+            .subscribe {
+                ed_barcode!!.setText(it)
+            })
 
+
+        var flwBarcode = edTextChangesToFlowable(ed_barcode as TextView)
+        var flwStart = edTextChangesToFlowable(ed_start as TextView)
+        var flwEnd = edTextChangesToFlowable(ed_end as TextView)
+        var flwCoff = edTextChangesToFlowable(ed_coff as TextView)
+
+
+        bagDisposable.add(
+            flwBarcode
+                .map {
+                    it
+                }
+                .combineLatest(flwStart)
+                .map {
+                    it
+                }
+                .map {
+                    object {
+                        var barcode = it.first
+                        var start = it.second.toIntOrNull() ?: 0
+                        var end = 0
+                        var coff = 0f
+                    }
+                }
+                .combineLatest(flwEnd)
+                .map {
+                    it.first.end = it.second.toIntOrNull() ?: 0
+                    return@map it.first
+                }
+                .combineLatest(flwCoff)
+                .map {
+                    it.first.coff = it.second.toFloatOrNull() ?: 0f
+                    return@map it.first
+                }
+                .map {
+                    getWeightByBarcode(
+                        barcode = it.barcode,
+                        start = it.start,
+                        finish = it.end,
+                        coff = it.coff
+                    )
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    var str = it.toString()
+                    ed_weight!!.setText(str)
+                }
+        )
+
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        bagDisposable.clear()
+    }
 }

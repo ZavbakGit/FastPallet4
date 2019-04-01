@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.anit.fastpallet4.presentaition.navigation.BackButtonListener
+import com.anit.fastpallet4.presentaition.ui.util.showError
 import com.anit.fastpallet4.presentaition.ui.util.showMessage
 import com.arellomobile.mvp.MvpAppCompatFragment
 import io.reactivex.disposables.CompositeDisposable
@@ -22,8 +23,12 @@ abstract class BaseFragment : MvpAppCompatFragment(), BackButtonListener {
         return view
     }
 
-    fun showSnackbarView(messager: CharSequence) {
+    fun showSnackbarViewMess(messager: CharSequence) {
         showMessage(view!!,messager)
+    }
+
+    fun showSnackbarViewError(messager: CharSequence) {
+        showError(view!!,messager)
     }
 
     fun getFragmentTransaction() = activity!!.supportFragmentManager.beginTransaction()
