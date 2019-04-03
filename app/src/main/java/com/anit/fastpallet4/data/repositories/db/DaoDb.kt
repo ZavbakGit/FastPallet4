@@ -1,18 +1,16 @@
-package com.anit.fastpallet4.data.repositories
+package com.anit.fastpallet4.data.repositories.db
 
 import com.anit.fastpallet4.app.App
-import com.anit.fastpallet4.data.repositories.maping.Maping
-import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
 import com.anit.fastpallet4.domain.intity.MetaObj
-import com.anit.fastpallet4.data.db.intity.DocumentRm
-import com.anit.fastpallet4.data.db.intity.ItemListRm
+import com.anit.fastpallet4.data.repositories.db.intity.DocumentRm
+import com.anit.fastpallet4.data.repositories.db.intity.ItemListRm
+import com.anit.fastpallet4.maping.Maping
 import com.anit.fastpallet4.domain.intity.listmetaobj.ItemListMetaObj
 
 import io.reactivex.Flowable
-import io.realm.Realm
 import javax.inject.Inject
 
-class Dao {
+class DaoDb {
 
     @Inject
     lateinit var realmInitLocal: RealmInitLocal

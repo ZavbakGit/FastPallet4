@@ -7,6 +7,7 @@ import com.anit.fastpallet4.domain.intity.Type.INVENTORY_PALLET
 import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
 import com.anit.fastpallet4.domain.intity.metaobj.Status.NEW
 import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
+import com.anit.fastpallet4.domain.usecase.UseCaseGetListDocFromServer
 import com.anit.fastpallet4.domain.usecase.UseCaseGetListMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorCreatorMetaObj
 import com.anit.fastpallet4.presentaition.presenter.Model.MAIN_MENU.*
@@ -17,6 +18,8 @@ import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.doc.CreatePalle
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocView
 import com.arellomobile.mvp.InjectViewState
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import ru.terrakok.cicerone.Router
 import java.util.*
 import javax.inject.Inject
@@ -49,7 +52,14 @@ class ListDocPresenter(
     fun onClickMainPopMenu(itemId: Int): Boolean {
         when (model.getMainMenuById(itemId)) {
             INVENTORY -> model.createNewInventory()
-            LOAD -> model.createTestCreatePallet()
+            SETTINGS -> router.navigateTo(screens.getPreferencesScreen())
+            LOAD -> model.loadDocs().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+
+                }, {
+                    viewState.showSnackbarViewError(it.message?:"")
+                })
         }
         return true
     }
@@ -68,10 +78,13 @@ class ListDocPresenter(
                 screens.getCreatePalletFrScreen(CreatePalletFrScreen.InputParamObj(guid = guid))
             )
 
+
         }
 
 
     }
+
+
 
 }
 
@@ -80,6 +93,9 @@ class Model {
 
     @Inject
     lateinit var interactorGetList: UseCaseGetListMetaObj
+
+    @Inject
+    lateinit var interacLoadDocsFromServer: UseCaseGetListDocFromServer
 
     init {
         App.appComponent.inject(this)
@@ -150,6 +166,10 @@ class Model {
                     )
                 }
             }
+
+    fun loadDocs() = interacLoadDocsFromServer.load()
+
+
 }
 
 

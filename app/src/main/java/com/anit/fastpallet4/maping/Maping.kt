@@ -1,8 +1,9 @@
-package com.anit.fastpallet4.data.repositories.maping
+package com.anit.fastpallet4.maping
 
 import com.anit.fastpallet4.app.App
-import com.anit.fastpallet4.data.db.intity.DocumentRm
-import com.anit.fastpallet4.data.db.intity.ItemListRm
+import com.anit.fastpallet4.data.repositories.db.intity.DocumentRm
+import com.anit.fastpallet4.data.repositories.db.intity.ItemListRm
+import com.anit.fastpallet4.data.repositories.net.intity.getlistdocs.DocResponse
 import com.anit.fastpallet4.domain.intity.MetaObj
 import com.anit.fastpallet4.domain.intity.Type
 import com.anit.fastpallet4.domain.intity.Type.CREATE_PALLET
@@ -117,6 +118,10 @@ class Maping {
     private fun mapCreateInventory(doc: DocumentRm): InventoryPallet {
         //return Json.parse(InventoryPallet.serializer(), doc.data ?: "")
         return gson.fromJson(doc.data, InventoryPallet::class.java)
+    }
+
+    fun map(docResponse: DocResponse): MetaObj? {
+        return null
     }
 }
 

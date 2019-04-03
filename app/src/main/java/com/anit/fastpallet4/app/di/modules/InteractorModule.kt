@@ -2,11 +2,12 @@ package com.anit.fastpallet4.app.di.modules
 
 
 
-import com.anit.fastpallet4.data.repositories.maping.Maping
+import com.anit.fastpallet4.domain.usecase.UseCaseGetListDocFromServer
 import com.anit.fastpallet4.domain.usecase.UseCaseGetListMetaObj
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetFlowableListMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObj
+import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorGetListDocFromServer
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -23,6 +24,12 @@ class InteractorModule{
     @Provides
     fun provideUseCaseGetMetaObj(): UseCaseGetMetaObj
             = InteractorUseCaseGetMetaObj()
+
+
+    @Singleton
+    @Provides
+    fun provideInteractorGetListDocFromServer(): UseCaseGetListDocFromServer
+            = InteractorGetListDocFromServer()
 
 
 }

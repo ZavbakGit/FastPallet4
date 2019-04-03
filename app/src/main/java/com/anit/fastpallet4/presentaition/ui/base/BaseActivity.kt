@@ -2,7 +2,7 @@ package com.anit.fastpallet4.presentaition.ui.base
 
 import android.os.Bundle
 import com.anit.fastpallet4.app.App
-import com.anit.fastpallet4.data.repositories.RealmInitLocal
+import com.anit.fastpallet4.data.repositories.db.RealmInitLocal
 import com.anit.fastpallet4.presentaition.navigation.BackButtonListener
 import com.anit.fastpallet4.presentaition.navigation.RouterProvider
 import com.arellomobile.mvp.MvpAppCompatActivity

@@ -1,4 +1,4 @@
-package com.anit.fastpallet4.data.repositories
+package com.anit.fastpallet4.data.repositories.db
 
 import io.realm.Realm
 

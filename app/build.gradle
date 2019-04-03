@@ -79,4 +79,6 @@ dependencies {
 
 
     implementation project(path: ':barcode')
+    implementation project(path: ':netreqest')
+    implementation project(path: ':preference')
 }
