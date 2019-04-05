@@ -32,5 +32,7 @@ open class App : Application() {
             .build()
     }
 
+    //ToDo надо проверять настройки и запускать или main или pref
+
 }
 

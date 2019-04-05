@@ -3,6 +3,7 @@ package com.anit.fastpallet4.presentaition.ui.mainactivity
 
 import android.os.Bundle
 import com.anit.fastpallet4.R
+import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.presentaition.navigation.RouterProvider
 import com.anit.fastpallet4.presentaition.presenter.MainPresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseActivity
@@ -12,8 +13,10 @@ import com.anit.fastpallet4.presentaition.ui.util.showMessage
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.gladkikh.mylibrary.BarcodeHelper
+import com.gladkikh.preference.PreferenceHelper
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
+import javax.inject.Inject
 
 class MainActivity :BaseActivity(), BaseView, RouterProvider {
 
@@ -21,13 +24,23 @@ class MainActivity :BaseActivity(), BaseView, RouterProvider {
     @InjectPresenter
     lateinit var presenter: MainPresenter
 
+    @Inject
+    lateinit var preferenceHelper: PreferenceHelper
+
     private lateinit var barcodeHelper: BarcodeHelper
+
+
+
     fun getFlowableBarcode() = barcodeHelper.getDataFlowable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        App.appComponent.inject(this)
         super.onCreate(savedInstanceState)
-        barcodeHelper = BarcodeHelper(this)
+        var typeTsd = BarcodeHelper.TYPE_TSD.getTypeTSD(preferenceHelper.getTypeTsd()?.toIntOrNull())
+
+        barcodeHelper = BarcodeHelper(this,typeTsd)
     }
+
 
     @ProvidePresenter
     fun provideMainPresenter() = MainPresenter(getRouter())

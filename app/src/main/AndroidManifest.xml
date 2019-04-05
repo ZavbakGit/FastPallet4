@@ -17,7 +17,8 @@
         <activity android:name="com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
+                <action android:name="com.motorolasolutions.emdk.sample.dwdemosample.RECVR"/>
+                <action android:name="com.xcheng.scanner.action.BARCODE_DECODING_BROADCAST"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>

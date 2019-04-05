@@ -23,6 +23,7 @@ import com.anit.fastpallet4.presentaition.presenter.Model
 import com.anit.fastpallet4.presentaition.presenter.createpallet.doc.CreatePalletPresenter
 import com.anit.fastpallet4.presentaition.presenter.createpallet.pallet.PalletCreatePalletPresenter
 import com.anit.fastpallet4.presentaition.presenter.createpallet.product.ProductCreatePalletPresenter
+import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
 import dagger.Component
 import javax.inject.Singleton
 
@@ -47,6 +48,7 @@ interface AppComponent {
     fun inject(interactorUseCaseGetMetaObj: InteractorUseCaseGetMetaObj)
     fun inject(interactorUseCaseMetaObj: InteractorUseCaseMetaObj)
     fun inject(baseActivity: BaseActivity)
+    fun inject(baseActivity: MainActivity)
     fun inject(mainPresenter: MainPresenter)
     fun inject(model: Model)
     fun inject(listDocPresenter: ListDocPresenter)

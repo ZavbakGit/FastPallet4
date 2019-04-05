@@ -11,10 +11,31 @@ import android.support.v7.app.AppCompatActivity
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.PublishSubject
 
-class BarcodeHelper(private val context: AppCompatActivity) : LifecycleObserver {
+class BarcodeHelper(private val context: AppCompatActivity,typE_TSD: TYPE_TSD?) : LifecycleObserver {
 
     private val intent: Intent
     private val mServiceConn: ServiceConnection
+
+    enum class TYPE_TSD(val id:Int,val fullName:String,val action:String,val keyBarcode:String){
+        ATOL_SMART_DROID(1,"АТОЛ Smart.Droid",
+            "com.motorolasolutions.emdk.sample.dwdemosample.RECVR",
+            "com.hht.emdk.datawedge.data_string"),
+
+        ATOL_SMART_LIGHT(2,"АТОЛ Smart.Lite",
+            "com.xcheng.scanner.action.BARCODE_DECODING_BROADCAST",
+            "EXTRA_BARCODE_DECODING_DATA");
+
+        companion object {
+            fun getTypeTSD(id:Int?):TYPE_TSD?{
+               return when(id){
+                    1 -> ATOL_SMART_DROID
+                    2-> ATOL_SMART_LIGHT
+                    else -> null
+                }
+            }
+        }
+
+    }
 
     /**
      * get PublishSubject with barcode
@@ -24,6 +45,9 @@ class BarcodeHelper(private val context: AppCompatActivity) : LifecycleObserver 
 
     init {
         intent = Intent(context, BrodcastService::class.java)
+        intent.putExtra(BrodcastService.INTENT_KEY_ACTION,typE_TSD?.action)
+        intent.putExtra(BrodcastService.INTENT_KEY_KEY_BARCODE,typE_TSD?.keyBarcode)
+
 
         mServiceConn = object : ServiceConnection {
             override fun onServiceDisconnected(name: ComponentName?): Unit {
@@ -71,4 +95,6 @@ class BarcodeHelper(private val context: AppCompatActivity) : LifecycleObserver 
             AppCompatActivity.BIND_AUTO_CREATE
         )
     }
+
+
 }

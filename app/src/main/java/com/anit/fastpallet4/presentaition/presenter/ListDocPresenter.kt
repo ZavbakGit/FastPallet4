@@ -1,5 +1,6 @@
 package com.anit.fastpallet4.presentaition.presenter
 
+import android.os.Handler
 import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.domain.intity.Type
 import com.anit.fastpallet4.domain.intity.Type.CREATE_PALLET
@@ -18,11 +19,14 @@ import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.doc.CreatePalle
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocView
 import com.arellomobile.mvp.InjectViewState
+import com.gladkikh.preference.PreferenceHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import ru.terrakok.cicerone.Router
 import java.util.*
 import javax.inject.Inject
+import android.support.v4.os.HandlerCompat.postDelayed
+
 
 @InjectViewState
 class ListDocPresenter(
@@ -30,13 +34,20 @@ class ListDocPresenter(
     router: Router,
     val inputParamObj: ListDocFrScreen.InputParamObj?
 
+
 ) : BasePresenter<ListDocView>(router) {
 
     val model = Model()
 
+    @Inject
+    lateinit var preferenceHelper: PreferenceHelper
+
     init {
         App.appComponent.inject(this)
     }
+
+
+
 
     override fun onBackPressed(): Boolean {
         router.exit()
@@ -58,7 +69,7 @@ class ListDocPresenter(
                 .subscribe({
 
                 }, {
-                    viewState.showSnackbarViewError(it.message?:"")
+                    viewState.showSnackbarViewError(it.message ?: "")
                 })
         }
         return true
@@ -83,7 +94,6 @@ class ListDocPresenter(
 
 
     }
-
 
 
 }

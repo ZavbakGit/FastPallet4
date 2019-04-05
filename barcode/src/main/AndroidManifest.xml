@@ -9,6 +9,7 @@
                 android:exported="true">
             <intent-filter>
                 <action android:name="com.motorolasolutions.emdk.sample.dwdemosample.RECVR"/>
+                <!--<action android:name="com.xcheng.scanner.action.BARCODE_DECODING_BROADCAST"/>-->
             </intent-filter>
         </service>
     </application>

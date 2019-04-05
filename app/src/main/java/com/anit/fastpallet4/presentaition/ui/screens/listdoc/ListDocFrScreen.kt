@@ -69,7 +69,11 @@ class ListDocFrScreen : BaseFragment(), ListDocView {
         tv_menu.setOnClickListener {
             presenter.onClickMainMenu()
         }
+
     }
+
+
+
 
     override fun showMainMenu(listmenu: List<Pair<Int, String>>) {
         var popupMenu = PopupMenu(activity, tv_menu)

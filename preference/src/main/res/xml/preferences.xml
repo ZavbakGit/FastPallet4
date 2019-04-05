@@ -29,7 +29,13 @@
             android:singleLine="true"
             android:title="Код терминала" />
 
-
+    <ListPreference
+            android:entries="@array/entries_type_tsd"
+            android:entryValues="@array/entry_values_tsd"
+            android:key="list_tsd"
+            android:summary="Терминал сбора данных"
+            android:title="ТСД">
+    </ListPreference>
 
 
 </PreferenceScreen>

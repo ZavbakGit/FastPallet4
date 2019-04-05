@@ -8,4 +8,5 @@ interface PreferenceHelper {
     fun getLogin():String?
     fun getPass():String?
     fun getCode(): String?
+    fun getTypeTsd():String?
 }

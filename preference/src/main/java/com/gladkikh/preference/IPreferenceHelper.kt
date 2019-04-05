@@ -8,6 +8,7 @@ import android.support.v7.preference.PreferenceManager
 
 class IPreferenceHelper (val context: Context):PreferenceHelper {
 
+
     val sharedPref:SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     companion object {
@@ -15,14 +16,15 @@ class IPreferenceHelper (val context: Context):PreferenceHelper {
         val login = "preference_login"
         val pass  = "preference_pass"
         val code  = "preference_code_1c"
+        val listTsd  = "list_tsd"
     }
 
-    override public fun getIntentPreferenceActivity() = Intent(context, ProjectPreferenceActivity::class.java)
+    override  fun getIntentPreferenceActivity() = Intent(context, ProjectPreferenceActivity::class.java)
 
-    override public fun getHost()  = sharedPref.getString(host, null)
-    override public fun getLogin() = sharedPref.getString(login, null)
-    override public fun getPass()  = sharedPref.getString(pass, null)
-    override public fun getCode()  = sharedPref.getString(code, null)
-
+    override  fun getHost()  = sharedPref.getString(host, null)
+    override  fun getLogin() = sharedPref.getString(login, null)
+    override  fun getPass()  = sharedPref.getString(pass, null)
+    override  fun getCode()  = sharedPref.getString(code, null)
+    override fun getTypeTsd()= sharedPref.getString(listTsd, null)
 
 }
