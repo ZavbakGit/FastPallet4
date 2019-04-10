@@ -11,6 +11,7 @@ import com.anit.fastpallet4.data.repositories.preferense.DaoPref
 import com.anit.fastpallet4.maping.Maping
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetFlowableListMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObj
+import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObjByGuidServer
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorGetListDocFromServer
 import com.anit.fastpallet4.presentaition.navigation.LocalNavigationModule
@@ -65,6 +66,7 @@ interface AppComponent {
     fun inject(managerNet: ManagerNet)
     fun inject(screens: Screens)
     fun inject(daoNet: DaoNet)
+    fun inject(interactorUseCaseGetMetaObjByGuidServer: InteractorUseCaseGetMetaObjByGuidServer)
 
 }
 

@@ -26,8 +26,8 @@ class DaoNet {
         App.appComponent.inject(this)
     }
 
-    fun getListDocs(): Flowable<List<MetaObj?>> {
-        var command = "command_confirm_doc_create_pallet"
+    fun getListDocs(): Flowable<List<MetaObj>> {
+        var command = "command_get_doc_create_pallet"
         var codeTsd = daoPref.getCodeTsd()
 
         return Flowable.just(1)
@@ -57,7 +57,7 @@ class DaoNet {
                 }
             }
             .flatMap {
-                if (it.all { it == null}) {
+                if (it.any { it == null}) {
                     return@flatMap Flowable.error<Throwable>(Throwable("Ошибка сериализации документа!"))
                 }else{
                     return@flatMap Flowable.just(it)

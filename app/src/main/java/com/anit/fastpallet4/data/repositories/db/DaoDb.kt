@@ -68,6 +68,20 @@ class DaoDb {
 
     }
 
+    fun getMetaObjByServerGuid(guidServer: String): MetaObj? {
+        var realm = realmInitLocal.getLocalInstance()
+        var doc = realm.where(DocumentRm::class.java)
+            .equalTo("guidServer", guidServer)
+            .findFirst()
+
+        return if (doc == null) {
+            null
+        } else {
+            maping.map(doc)
+        }
+
+    }
+
     fun getFlowableList(): Flowable<List<ItemListMetaObj?>> {
         var realm = realmInitLocal.getLocalInstance()
         return realm.where(ItemListRm::class.java)

@@ -37,6 +37,7 @@ class MainActivity :BaseActivity(), BaseView, RouterProvider {
         App.appComponent.inject(this)
         super.onCreate(savedInstanceState)
         var typeTsd = BarcodeHelper.TYPE_TSD.getTypeTSD(preferenceHelper.getTypeTsd()?.toIntOrNull())
+            ?:BarcodeHelper.TYPE_TSD.ATOL_SMART_DROID
 
         barcodeHelper = BarcodeHelper(this,typeTsd)
     }

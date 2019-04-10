@@ -8,6 +8,7 @@ import com.anit.fastpallet4.presentaition.presenter.createpallet.product.Product
 import com.anit.fastpallet4.presentaition.ui.base.BaseFragment
 import com.anit.fastpallet4.presentaition.ui.base.BaseView
 import com.anit.fastpallet4.presentaition.ui.base.MyListFragment
+import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import kotlinx.android.synthetic.main.doc_scr.*
@@ -72,11 +73,12 @@ class ProductCreatePalletFrScreen : BaseFragment(), BaseView {
                 }
         )
 
-        tv_info.setOnClickListener {
-            presenter.readBarcode("10.1")
-        }
-
-
+        bagDisposable.add((activity as MainActivity).getFlowableBarcode()
+            .subscribe {
+                if (!it.isNullOrEmpty()){
+                    presenter.readBarcode(it!!)
+                }
+            })
     }
 
 }

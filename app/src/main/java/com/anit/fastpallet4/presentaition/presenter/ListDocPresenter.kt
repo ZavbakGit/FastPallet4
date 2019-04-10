@@ -64,10 +64,10 @@ class ListDocPresenter(
         when (model.getMainMenuById(itemId)) {
             INVENTORY -> model.createNewInventory()
             SETTINGS -> router.navigateTo(screens.getPreferencesScreen())
-            LOAD -> model.loadDocs().subscribeOn(Schedulers.io())
+            LOAD -> model.loadDocs()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-
+                    viewState.showSnackbarViewMess("Ок")
                 }, {
                     viewState.showSnackbarViewError(it.message ?: "")
                 })

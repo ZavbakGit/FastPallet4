@@ -13,6 +13,4 @@ enum class Type(val id: Int) {
             }
         }
     }
-
-
 }

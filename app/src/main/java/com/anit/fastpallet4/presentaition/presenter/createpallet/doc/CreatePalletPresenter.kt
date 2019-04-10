@@ -53,10 +53,6 @@ class CreatePalletPresenter(
         }
     }
 
-    fun readBarcode(barcode: String) {
-        model.createTestPallet()
-    }
-
 
 }
 
@@ -87,11 +83,11 @@ class Model(guid: String) {
     }
 
     fun createTestPallet() {
-        var strProd =  StringProduct()
-        strProd.nameProduct = "Product ${Random().nextInt(50).toString()}"
-        doc.addStringProduct(strProd)
-        doc.save()
-        refreshViewModel()
+//        var strProd =  StringProduct()
+//        strProd.nameProduct = "Product ${Random().nextInt(50).toString()}"
+//        doc.addStringProduct(strProd)
+//        doc.save()
+//        refreshViewModel()
     }
 
 

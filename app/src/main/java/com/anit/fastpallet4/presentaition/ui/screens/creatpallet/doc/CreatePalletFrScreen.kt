@@ -8,6 +8,7 @@ import com.anit.fastpallet4.presentaition.presenter.createpallet.doc.CreatePalle
 import com.anit.fastpallet4.presentaition.ui.base.BaseFragment
 import com.anit.fastpallet4.presentaition.ui.base.BaseView
 import com.anit.fastpallet4.presentaition.ui.base.MyListFragment
+import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import kotlinx.android.synthetic.main.doc_scr.*
@@ -71,11 +72,6 @@ class CreatePalletFrScreen : BaseFragment(), BaseView {
                     presenter.onClickItem(it)
                 }
         )
-
-        tv_info.setOnClickListener {
-            presenter.readBarcode("10.1")
-        }
-
 
     }
 

@@ -47,6 +47,8 @@ class BrodcastService() : Service() {
         keyBarcode = intent.getStringExtra(INTENT_KEY_KEY_BARCODE)
         val intentFilter = IntentFilter(action)
         registerReceiver(mBarcodeDataBroadcastReceiver, intentFilter)
+
+
         return super.onStartCommand(intent, flags, startId)
     }
 

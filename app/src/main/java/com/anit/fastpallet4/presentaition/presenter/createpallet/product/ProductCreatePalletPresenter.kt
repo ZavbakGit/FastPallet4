@@ -1,11 +1,14 @@
 package com.anit.fastpallet4.presentaition.presenter.createpallet.product
 
 
+import android.annotation.SuppressLint
 import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
 import com.anit.fastpallet4.domain.intity.metaobj.Pallet
 import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
+import com.anit.fastpallet4.domain.utils.getNumberDocByBarCode
+import com.anit.fastpallet4.domain.utils.isPallet
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseView
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
@@ -13,6 +16,8 @@ import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCr
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.product.ProductCreatePalletFrScreen
 import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
+import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.subjects.BehaviorSubject
 import ru.terrakok.cicerone.Router
 import java.util.*
@@ -43,7 +48,13 @@ class ProductCreatePalletPresenter(
         .toFlowable(BackpressureStrategy.BUFFER)
 
     fun readBarcode(barcode: String) {
-        model.createTestPallet()
+        model.createPaletByBarcode(barcode)
+            .subscribe({
+                viewState.showSnackbarViewMess("Ок")
+            }, {
+                viewState.showSnackbarViewError(it.message.toString())
+            })
+
     }
 
     fun onClickItem(index: Int?) {
@@ -80,9 +91,50 @@ class Model(
         doc = interactorGetDoc.get(guid) as CreatePallet
         stringProduct = doc.stringProducts.get(indexProduct)
 
-
-
         refreshViewModel()
+    }
+
+
+    fun createPaletByBarcode(barcode: String): Completable {
+        return Flowable.just(barcode)
+            .flatMap {
+                if (isPallet(barcode)) {
+                    return@flatMap Flowable.just(it)
+                } else {
+                    return@flatMap Flowable.error<Throwable>(Throwable("Это не паллета!"))
+                }
+            }
+            .map {
+                it as String
+            }
+            .map {
+                var pallet = Pallet()
+                pallet.barcode = it
+                pallet.number = getNumberDocByBarCode(it)
+
+                return@map pallet
+            }
+            .flatMap { pallet ->
+                var listPallet = doc.stringProducts
+                    .flatMap {
+                        it.pallets.map {
+                            it
+                        }
+                    }
+
+                if (listPallet.filter { it.number.equals(pallet.number, true) }.size > 0) {
+                    return@flatMap Flowable.error<Throwable>(Throwable("Эта паллета уже есть!"))
+                } else {
+                    return@flatMap Flowable.just(pallet)
+                }
+
+            }
+            .doOnNext {
+                stringProduct.addPallet(it as Pallet)
+                doc.save()
+                refreshViewModel()
+            }
+            .ignoreElements()
     }
 
     fun refreshViewModel() {
@@ -98,16 +150,6 @@ class Model(
         )
     }
 
-
-    fun createTestPallet() {
-
-        var pallet = Pallet()
-        pallet.number = "Pallet ${Random().nextInt(50)}"
-        stringProduct.pallets.add(pallet)
-
-        doc.save()
-        refreshViewModel()
-    }
 
 }
 

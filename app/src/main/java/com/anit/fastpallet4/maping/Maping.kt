@@ -12,7 +12,9 @@ import com.anit.fastpallet4.domain.intity.listmetaobj.ItemListMetaObj
 import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
 import com.anit.fastpallet4.domain.intity.metaobj.InventoryPallet
 import com.anit.fastpallet4.domain.intity.metaobj.Status
+import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
 import com.google.gson.Gson
+import java.util.*
 import javax.inject.Inject
 
 class Maping {
@@ -27,13 +29,6 @@ class Maping {
 
     fun map(doc: MetaObj): DocumentRm {
         var data = gson.toJson(doc)
-
-//        var data = when (doc.type) {
-//            CREATE_PALLET -> mapCreatPlletToStr(doc as CreatePallet)
-//            INVENTORY_PALLET -> mapInventoryPalletToStr(doc as InventoryPallet)
-//            else->null
-//        }
-
 
         return DocumentRm(
             guid = doc.guid,
@@ -99,16 +94,6 @@ class Maping {
         )
     }
 
-    private fun mapCreatPlletToStr(doc: CreatePallet): String {
-        //return Json.stringify(CreatePallet.serializer(), doc)
-        return gson.toJson(doc)
-    }
-
-    private fun mapInventoryPalletToStr(doc: InventoryPallet): String {
-        //return Json.stringify(InventoryPallet.serializer(), doc)
-        return gson.toJson(doc)
-    }
-
     private fun mapCreatePallet(doc: DocumentRm): CreatePallet {
         //return Json.parse(CreatePallet.serializer(), doc.data ?: "")
         return gson.fromJson(doc.data, CreatePallet::class.java)
@@ -121,7 +106,52 @@ class Maping {
     }
 
     fun map(docResponse: DocResponse): MetaObj? {
-        return null
+        return when {
+            docResponse.type.equals("ФормированиеПалет", true) -> {
+                var doc = CreatePallet()
+                doc.guidServer = docResponse.guid
+                doc.status = getStatusByString(docResponse.status)!!
+                doc.number = docResponse.number
+                doc.date = docResponse.date
+                doc.description = docResponse.description
+
+                var list = docResponse.listStringsProduct?.map {
+                    var strProd = StringProduct()
+
+
+                    strProd.guidProduct = it.guidProduct
+                    strProd.nameProduct = it.nameProduct
+                    strProd.codeProduct = it.codeProduct
+                    strProd.ed = it.ed
+
+                    strProd.weightStartProduct = it.weightStartProduct?.toIntOrNull() ?: 0
+                    strProd.weightEndProduct = it.weightEndProduct?.toIntOrNull() ?: 0
+                    strProd.weightCoffProduct = it.weightCoffProduct?.toFloatOrNull() ?: 0f
+
+                    strProd.edCoff = it.edCoff?.toFloatOrNull() ?: 0f
+                    strProd.count = it.count?.toFloatOrNull() ?: 0f
+                    strProd.countBox = it.countBox?.toIntOrNull() ?: 0
+
+                    strProd.isWasLoadedLastTime = true
+
+                    return@map strProd
+
+                }
+
+                list?.let {
+                    doc.stringProducts.addAll(it)
+                }
+
+                return doc
+
+            }
+
+            else -> null
+
+
+        }
+
+
     }
 }
 
