@@ -15,7 +15,6 @@ import com.google.gson.FieldAttributes
 import com.google.gson.ExclusionStrategy
 
 
-
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -24,60 +23,19 @@ import com.google.gson.ExclusionStrategy
 class ExampleUnitTest {
 
 
-    enum class HHH{
-        TT,YY
-    }
-
-    abstract class Foo(var name:String,val born: Date?,val h:HHH = HHH.TT ){
-
-        //@Expose(serialize = false)
-        var  gason:Gson = GsonBuilder().create()
-    }
-
-    class Doo(name:String,val age:Int):Foo(name,Date()){
-        override fun toString(): String {
-            return "Doo(age=$age)"
-        }
-    }
-
-
     @Test
     fun addition_isCorrect() {
+        var listDb = listOf("Вася","Петя")
+        var listServ = listOf("Вася","Вася","Саша")
 
-
-//        val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation()
-//            .setPrettyPrinting().create()
-
-        val gson = GsonBuilder()
-            .addSerializationExclusionStrategy(object : ExclusionStrategy {
-                override fun shouldSkipField(f: FieldAttributes): Boolean {
-                    return f.name.toLowerCase().contains("gason")
-                }
-
-                override fun shouldSkipClass(aClass: Class<*>): Boolean {
-                    return false
-                }
-            })
-            .create()
-
-
-        //var t = Doo("jhghj",10)
-        //var str = gson.toJson(t)
-
-        //var f = gson.fromJson(str,Doo::class.java)
-        //println(f)
+       listServ.distinct()
 
 
 
-         var doc = InventoryPallet()
-        doc.guid = "111"
-        var str = gson.toJson(doc)
+        listServ.filter { it !in listDb }
 
 
-//        var str = Json.stringify(InventoryPallet.serializer(), doc)
-//        var doc1 = Json.parse(InventoryPallet.serializer(), str)
-//
-        println(doc)
+
 
         assertEquals(4, 2 + 2)
     }

@@ -21,17 +21,19 @@
             <TextView
                     android:padding="8dp"
                     android:id="@+id/tv_info"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Описание"
-                    android:maxLines="2"/>
+                    android:maxLines="3"
+                    style="@style/description"/>
 
             <TextView
                     android:text="Документ"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/tv_info__doc_left"
+                    android:id="@+id/tv_info_doc_left"
                     android:layout_below="@+id/tv_info"
+                    android:layout_margin="8dp"
             />
 
             <TextView
@@ -41,6 +43,7 @@
                     android:id="@+id/tv_info_doc_right"
                     android:layout_below="@+id/tv_info"
                     android:layout_alignParentRight="true"
+                    android:layout_margin="8dp"
             />
 
 

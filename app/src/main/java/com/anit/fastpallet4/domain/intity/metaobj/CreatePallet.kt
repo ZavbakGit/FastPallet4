@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 class CreatePallet : MetaObj(type = Type.CREATE_PALLET) {
 
-    val stringProducts: MutableList<StringProduct> = mutableListOf()
+    var stringProducts: MutableList<StringProduct> = mutableListOf()
 
     fun addStringProduct(stringProduct:StringProduct) {
         stringProducts.add(stringProduct)

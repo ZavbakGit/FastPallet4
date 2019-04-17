@@ -27,3 +27,11 @@ fun edTextChangesToFlowable(view: TextView): Flowable<String>
     .distinctUntilChanged()
     //.skip(1)
     .toFlowable(BackpressureStrategy.BUFFER)
+
+class KeyKode{
+    companion object {
+        val KEY_MENU = 12
+    }
+}
+
+class EventKeyClick(val keyCode:Int,val id:Int)

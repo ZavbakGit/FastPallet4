@@ -138,14 +138,17 @@ class Model(
     }
 
     fun refreshViewModel() {
+
+
         behaviorSubjectViewModel.onNext(
             ViewModel(
                 info = "${stringProduct?.nameProduct}",
-                list = stringProduct.pallets.map {
-                    ItemList(
-                        info = it.number
-                    )
-                }
+                list = stringProduct.pallets
+                    .map {
+                        ItemList(
+                            info = it.number
+                        )
+                    }
             )
         )
     }

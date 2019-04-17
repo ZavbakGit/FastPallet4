@@ -4,11 +4,13 @@
                 android:layout_height="wrap_content">
 
     <TextView
+            android:layout_margin="8dp"
             android:text="Описание"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/tv_item_info"
-            android:layout_alignParentLeft="true"/>
+            android:layout_alignParentLeft="true"
+            style="@style/item_description"/>
 
 
     <TextView
@@ -17,7 +19,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/tv_info__doc_left"
             android:layout_below="@+id/tv_item_info"
-    />
+            android:layout_margin="8dp"
+            style="@style/item"/>
 
     <TextView
             android:text="Право"
@@ -26,6 +29,8 @@
             android:id="@+id/tv_info_doc_right"
             android:layout_below="@+id/tv_item_info"
             android:layout_alignParentRight="true"
+            android:layout_margin="8dp"
+            style="@style/item"
     />
 
 

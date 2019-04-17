@@ -30,7 +30,7 @@ class StringProduct {
 
 
     val boxes: MutableList<Box> = mutableListOf()
-    val pallets: MutableList<Pallet> = mutableListOf()
+    var pallets: MutableList<Pallet> = mutableListOf()
 
     fun addPallet(pallet: Pallet) {
         pallets.add(pallet)

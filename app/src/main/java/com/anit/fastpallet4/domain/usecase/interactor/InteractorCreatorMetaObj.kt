@@ -11,6 +11,7 @@ class InteractorCreatorMetaObj(val type: Type) : UseCreateMetaObj {
         return when (type) {
             Type.CREATE_PALLET -> CreatePallet()
             Type.INVENTORY_PALLET -> InventoryPallet()
+            else -> CreatePallet()
 
         }
     }

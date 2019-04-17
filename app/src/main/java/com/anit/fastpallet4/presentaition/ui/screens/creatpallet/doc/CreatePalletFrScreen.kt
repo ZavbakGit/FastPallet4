@@ -2,6 +2,7 @@ package com.anit.fastpallet4.presentaition.ui.screens.creatpallet.doc
 
 
 import android.os.Bundle
+import android.view.View
 import com.anit.fastpallet4.R
 import com.anit.fastpallet4.presentaition.navigation.RouterProvider
 import com.anit.fastpallet4.presentaition.presenter.createpallet.doc.CreatePalletPresenter
@@ -61,6 +62,9 @@ class CreatePalletFrScreen : BaseFragment(), BaseView {
                 }
         )
 
+        tv_info_doc_left.visibility = View.GONE
+        tv_info_doc_right.visibility = View.GONE
+
 
         var transaction = getFragmentTransaction()
         transaction.replace(R.id.conteiner_frame_list, listFrag)
@@ -72,6 +76,8 @@ class CreatePalletFrScreen : BaseFragment(), BaseView {
                     presenter.onClickItem(it)
                 }
         )
+
+        presenter.onStart()
 
     }
 

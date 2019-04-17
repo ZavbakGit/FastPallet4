@@ -14,6 +14,7 @@ import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaOb
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObjByGuidServer
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorGetListDocFromServer
+import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorSendCreatePalletToServer
 import com.anit.fastpallet4.presentaition.navigation.LocalNavigationModule
 import com.anit.fastpallet4.presentaition.navigation.NavigationModule
 import com.anit.fastpallet4.presentaition.navigation.Screens
@@ -67,6 +68,7 @@ interface AppComponent {
     fun inject(screens: Screens)
     fun inject(daoNet: DaoNet)
     fun inject(interactorUseCaseGetMetaObjByGuidServer: InteractorUseCaseGetMetaObjByGuidServer)
+    fun inject(interactorSendCreatePalletToServer: InteractorSendCreatePalletToServer)
 
 }
 

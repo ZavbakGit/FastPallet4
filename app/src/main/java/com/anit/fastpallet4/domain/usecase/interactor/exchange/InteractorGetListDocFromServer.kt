@@ -2,17 +2,19 @@ package com.anit.fastpallet4.domain.usecase.interactor.exchange
 
 import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.data.repositories.net.DaoNet
+import com.anit.fastpallet4.data.repositories.net.intity.ItemConfim
 import com.anit.fastpallet4.domain.intity.MetaObj
-import com.anit.fastpallet4.domain.intity.Type
 import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
+import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
 import com.anit.fastpallet4.domain.usecase.UseCaseGetListDocFromServer
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObjByGuidServer
-import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObj
-import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObjByGuidServer
+import com.anit.fastpallet4.maping.getStatusByString
+
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 import javax.inject.Inject
 
 class InteractorGetListDocFromServer : UseCaseGetListDocFromServer {
@@ -28,14 +30,71 @@ class InteractorGetListDocFromServer : UseCaseGetListDocFromServer {
 
 
     private fun joinDocServAndDB(servDoc: MetaObj): MetaObj {
-        var docDb = getMetaObjByGuidServer.get(servDoc.guidServer ?: "")
+        var dbDoc = getMetaObjByGuidServer.get(servDoc.guidServer ?: "")
 
-        if (docDb == null) {
+        if (dbDoc == null) {
             return servDoc
         } else {
 
-            return docDb
+            when {
+                dbDoc is CreatePallet -> {
+                    var newList: MutableList<StringProduct> = mutableListOf()
+
+                    newList.addAll((servDoc as CreatePallet).stringProducts)
+
+                    dbDoc.stringProducts.forEach { itDb ->
+
+                        var strProd = newList.find { it.guidProduct.equals(itDb.guidProduct) }
+
+                        if (strProd != null) {
+                            strProd.pallets = itDb.pallets
+                        } else {
+                            if (!itDb.pallets.isEmpty()) {
+                                newList.add(itDb)
+                            }
+                        }
+                    }
+
+                    dbDoc.stringProducts = newList
+                }
+
+
+            }
+
+            return dbDoc
         }
+    }
+
+    /**
+     * Проставляем новый статус из прешедших подтверждений
+     */
+    private fun getListWithNewStatus(listDocument: List<MetaObj>, listConfirm: List<ItemConfim>): List<MetaObj> {
+        return listDocument.map { document ->
+            var status = listConfirm.find { it.guid == document.guidServer }?.status
+
+            document.status = getStatusByString(status)!!
+            return@map document
+        }
+    }
+
+    private fun confirmDocuments(listDocument: List<MetaObj>): Flowable<List<MetaObj>> {
+        return daoNet.confirmDocs(listDocument)
+            .map {
+                it.listConfirm
+            }
+            .flatMap {
+                var b = (it.map { it.guid }.sortedBy { it } ==
+                        listDocument.map { it.guidServer }.sortedBy { it })
+
+                if (!b) {
+                    return@flatMap Flowable.error<Throwable>(Throwable("Не верное подтверждение!"))
+                } else {
+                    return@flatMap Flowable.just(getListWithNewStatus(listDocument, it))
+                }
+            }
+            .map {
+                it as List<MetaObj>
+            }
     }
 
     override fun load(): Completable {
@@ -45,9 +104,22 @@ class InteractorGetListDocFromServer : UseCaseGetListDocFromServer {
             .flatMap {
                 Flowable.fromIterable(it)
             }
+            .doOnError {
+                it
+            }
             .map {
                 joinDocServAndDB(it)
             }
+            .observeOn(Schedulers.io())
+            .toList()
+            .toFlowable()
+            .flatMap {
+                confirmDocuments(it)
+            }
+            .flatMap {
+                Flowable.fromIterable(it)
+            }
+            .observeOn(AndroidSchedulers.mainThread())
             .doOnNext {
                 it.save()
             }

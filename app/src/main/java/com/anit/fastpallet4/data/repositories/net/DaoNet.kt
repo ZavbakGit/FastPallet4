@@ -2,11 +2,12 @@ package com.anit.fastpallet4.data.repositories.net
 
 
 import com.anit.fastpallet4.app.App
-import com.anit.fastpallet4.data.repositories.net.intity.getlistdocs.GetListDocsRequest
-import com.anit.fastpallet4.data.repositories.net.intity.getlistdocs.ListDocResponse
+import com.anit.fastpallet4.data.repositories.net.intity.*
+import com.anit.fastpallet4.data.repositories.net.intity.common.Response
 import com.anit.fastpallet4.data.repositories.preferense.DaoPref
 import com.anit.fastpallet4.domain.intity.MetaObj
 import com.anit.fastpallet4.maping.Maping
+import com.google.gson.Gson
 import io.reactivex.Flowable
 import javax.inject.Inject
 
@@ -21,9 +22,43 @@ class DaoNet {
     @Inject
     lateinit var maping: Maping
 
+    @Inject
+    lateinit var gson: Gson
+
 
     init {
         App.appComponent.inject(this)
+    }
+
+    fun confirmDocs(list: List<MetaObj>):Flowable<ConfirmResponse>
+    {
+        var command = "command_confirm_doc_create_pallet"
+        var codeTsd = daoPref.getCodeTsd()
+
+        return Flowable.just(1)
+            .flatMap {
+                Flowable.just(daoPref.getCodeTsd())
+            }
+            .flatMap {
+                if (it.isNullOrEmpty()) {
+                    return@flatMap Flowable.error<Throwable>(Throwable("Не заполнен код ТСД"))
+                } else {
+                    return@flatMap Flowable.just(it)
+                }
+            }
+            .flatMap {
+                var listDoc = list.map {
+                    DocConfirm(it.guidServer!!, it.type!!.nameServer)
+                }
+
+                managerNet.reqest(
+                    command = command,
+                    objReqest = ConfirmDocLoadRequest(it as String, listDoc),
+                    classReqest = ConfirmResponse::class.java
+                )
+            }.map {
+                (it as ConfirmResponse)
+            }
     }
 
     fun getListDocs(): Flowable<List<MetaObj>> {
@@ -57,9 +92,9 @@ class DaoNet {
                 }
             }
             .flatMap {
-                if (it.any { it == null}) {
+                if (it.any { it == null }) {
                     return@flatMap Flowable.error<Throwable>(Throwable("Ошибка сериализации документа!"))
-                }else{
+                } else {
                     return@flatMap Flowable.just(it)
                 }
             }
@@ -67,4 +102,31 @@ class DaoNet {
                 it as List<MetaObj>
             }
     }
+
+
+    fun sendCreatePallet(list: List<MetaObj>): Flowable<Response> {
+        var command = "command_send_doc_create_pallet"
+        var codeTsd = daoPref.getCodeTsd()
+
+       return Flowable.just(1)
+            .flatMap {
+                Flowable.just(daoPref.getCodeTsd())
+            }
+            .flatMap {
+                if (it.isNullOrEmpty()) {
+                    return@flatMap Flowable.error<Throwable>(Throwable("Не заполнен код ТСД"))
+                } else {
+                    return@flatMap Flowable.just(it)
+                }
+            }
+            .flatMap {
+                managerNet.reqest(
+                    command = command,
+                    objReqest = SendDocumentsReqest(codeTSD = it.toString(),list = list),
+                    classReqest = SendCreatePalletDocModelResponse::class.java
+                )
+            }
+    }
+
+
 }

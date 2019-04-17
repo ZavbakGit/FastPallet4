@@ -3,7 +3,7 @@ package com.anit.fastpallet4.maping
 import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.data.repositories.db.intity.DocumentRm
 import com.anit.fastpallet4.data.repositories.db.intity.ItemListRm
-import com.anit.fastpallet4.data.repositories.net.intity.getlistdocs.DocResponse
+import com.anit.fastpallet4.data.repositories.net.intity.DocResponse
 import com.anit.fastpallet4.domain.intity.MetaObj
 import com.anit.fastpallet4.domain.intity.Type
 import com.anit.fastpallet4.domain.intity.Type.CREATE_PALLET
@@ -13,8 +13,8 @@ import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
 import com.anit.fastpallet4.domain.intity.metaobj.InventoryPallet
 import com.anit.fastpallet4.domain.intity.metaobj.Status
 import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
+import com.anit.fastpallet4.domain.utils.getDecimalStr
 import com.google.gson.Gson
-import java.util.*
 import javax.inject.Inject
 
 class Maping {
@@ -108,6 +108,15 @@ class Maping {
     fun map(docResponse: DocResponse): MetaObj? {
         return when {
             docResponse.type.equals("ФормированиеПалет", true) -> {
+
+                if (docResponse.listStringsProduct?.map {
+                        it.guidProduct
+                    }?.distinct()?.size != docResponse.listStringsProduct?.size) {
+
+                    throw Throwable("Дубли Номенклатуры! ${docResponse.description}")
+
+                }
+
                 var doc = CreatePallet()
                 doc.guidServer = docResponse.guid
                 doc.status = getStatusByString(docResponse.status)!!
@@ -124,13 +133,17 @@ class Maping {
                     strProd.codeProduct = it.codeProduct
                     strProd.ed = it.ed
 
-                    strProd.weightStartProduct = it.weightStartProduct?.toIntOrNull() ?: 0
-                    strProd.weightEndProduct = it.weightEndProduct?.toIntOrNull() ?: 0
-                    strProd.weightCoffProduct = it.weightCoffProduct?.toFloatOrNull() ?: 0f
 
-                    strProd.edCoff = it.edCoff?.toFloatOrNull() ?: 0f
-                    strProd.count = it.count?.toFloatOrNull() ?: 0f
-                    strProd.countBox = it.countBox?.toIntOrNull() ?: 0
+
+
+
+                    strProd.weightStartProduct = getDecimalStr(it.weightStartProduct).toIntOrNull() ?: 0
+                    strProd.weightEndProduct = getDecimalStr(it.weightEndProduct).toIntOrNull() ?: 0
+                    strProd.weightCoffProduct = getDecimalStr(it.weightCoffProduct).toFloatOrNull() ?: 0f
+
+                    strProd.edCoff = getDecimalStr(it.edCoff).toFloatOrNull() ?: 0f
+                    strProd.count = getDecimalStr(it.count).toFloatOrNull() ?: 0f
+                    strProd.countBox = getDecimalStr(it.countBox).toIntOrNull() ?: 0
 
                     strProd.isWasLoadedLastTime = true
 
@@ -141,6 +154,8 @@ class Maping {
                 list?.let {
                     doc.stringProducts.addAll(it)
                 }
+
+
 
                 return doc
 

@@ -15,6 +15,7 @@ import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
 import ru.terrakok.cicerone.Router
+import java.math.BigDecimal
 import java.util.*
 import javax.inject.Inject
 
@@ -36,6 +37,10 @@ class CreatePalletPresenter(
         return true
     }
 
+    fun onStart(){
+        model.refreshViewModel()
+    }
+
     fun getViewModelFlowable() = model.behaviorSubjectViewModel
         .toFlowable(BackpressureStrategy.BUFFER)
 
@@ -53,41 +58,47 @@ class CreatePalletPresenter(
         }
     }
 
-
 }
 
-class Model(guid: String) {
+class Model(var guid: String) {
 
     @Inject
     lateinit var interactorGetDoc: UseCaseGetMetaObj
-    var doc: CreatePallet
+    var doc: CreatePallet? = null
     var behaviorSubjectViewModel = BehaviorSubject.create<ViewModel>()
 
     init {
         App.appComponent.inject(this)
-        doc = interactorGetDoc.get(guid) as CreatePallet
-        refreshViewModel()
+
     }
 
     fun refreshViewModel() {
+        doc = interactorGetDoc.get(guid) as CreatePallet
         behaviorSubjectViewModel.onNext(
             ViewModel(
                 info = "${doc?.description} ${doc?.guid ?: ""}",
-                list = doc.stringProducts.map {
+                list = doc!!.stringProducts.map {
+
+                   var listBox =  it.pallets
+                        .flatMap {
+                            it.boxes
+                        }
+                        .map {
+                            BigDecimal(it.weight.toString())
+                        }
+
+
+                   var weight =  listBox.fold(BigDecimal(0)){total:BigDecimal,next:BigDecimal ->total.add(next)}
+
+
                     ItemList(
-                        info = it.nameProduct
+                        info = it.nameProduct,
+                        left = "${it.count} / ${it.countBox}",
+                        right = "$weight / ${listBox.size}"
                     )
                 }
             )
         )
-    }
-
-    fun createTestPallet() {
-//        var strProd =  StringProduct()
-//        strProd.nameProduct = "Product ${Random().nextInt(50).toString()}"
-//        doc.addStringProduct(strProd)
-//        doc.save()
-//        refreshViewModel()
     }
 
 

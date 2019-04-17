@@ -4,8 +4,10 @@ package com.anit.fastpallet4.presentaition.ui.base
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.ListFragment
+import android.view.KeyEvent
 import android.view.View
 import android.widget.ListView
+import com.anit.fastpallet4.presentaition.ui.util.EventKeyClick
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
@@ -14,6 +16,7 @@ open abstract class BaseListFragment<T> : ListFragment() {
 
     var flowableListItem: Flowable<List<T>> = Flowable.empty()
     val publishSubjectItemClick = PublishSubject.create<Int>()
+    val publishSubjectKeyClick = PublishSubject.create<EventKeyClick>()
 
 
     protected abstract fun getlayoutItem(): Int
@@ -36,6 +39,18 @@ open abstract class BaseListFragment<T> : ListFragment() {
 
         adapter = Adapter(activity!!)
         setListAdapter(adapter);
+
+        listView.setOnKeyListener { view, keyKode, keyEvent ->
+
+            val position = listView.getSelectedItemPosition()
+
+            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+
+
+                publishSubjectKeyClick.onNext(EventKeyClick(keyCode = keyKode,id = position))
+            }
+            false
+        }
 
 
         bagDisposable.add(

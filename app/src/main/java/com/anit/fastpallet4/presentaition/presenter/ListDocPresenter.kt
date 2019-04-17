@@ -8,8 +8,6 @@ import com.anit.fastpallet4.domain.intity.Type.INVENTORY_PALLET
 import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
 import com.anit.fastpallet4.domain.intity.metaobj.Status.NEW
 import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
-import com.anit.fastpallet4.domain.usecase.UseCaseGetListDocFromServer
-import com.anit.fastpallet4.domain.usecase.UseCaseGetListMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorCreatorMetaObj
 import com.anit.fastpallet4.presentaition.presenter.Model.MAIN_MENU.*
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
@@ -26,6 +24,13 @@ import ru.terrakok.cicerone.Router
 import java.util.*
 import javax.inject.Inject
 import android.support.v4.os.HandlerCompat.postDelayed
+import com.anit.fastpallet4.domain.intity.listmetaobj.ItemListMetaObj
+import com.anit.fastpallet4.domain.usecase.*
+import com.anit.fastpallet4.presentaition.presenter.createpallet.pallet.ViewModel
+import com.anit.fastpallet4.presentaition.ui.util.EventKeyClick
+import com.anit.fastpallet4.presentaition.ui.util.KeyKode
+import io.reactivex.Completable
+import io.reactivex.subjects.BehaviorSubject
 
 
 @InjectViewState
@@ -45,8 +50,6 @@ class ListDocPresenter(
     init {
         App.appComponent.inject(this)
     }
-
-
 
 
     override fun onBackPressed(): Boolean {
@@ -95,6 +98,56 @@ class ListDocPresenter(
 
     }
 
+    enum class LIST_CONTEXT_MENU(val title: String, val id: Int) {
+        DELL("Удалить", 1), SEND("Отправить", 2);
+
+        companion object {
+            fun getEnumById(id: Int): LIST_CONTEXT_MENU? {
+                return when (id) {
+                    1 -> return DELL
+                    2 -> return SEND
+                    else -> null
+                }
+            }
+        }
+
+    }
+
+    fun getItemMenu(eventKeyClick: EventKeyClick): List<Pair<Int, String>>? {
+        if (KeyKode.KEY_MENU == eventKeyClick.keyCode) {
+            return listOf(
+                Pair(LIST_CONTEXT_MENU.SEND.id, LIST_CONTEXT_MENU.SEND.title),
+                Pair(LIST_CONTEXT_MENU.DELL.id, LIST_CONTEXT_MENU.DELL.title)
+
+            )
+        } else {
+            return null
+        }
+    }
+
+    fun onClicItemMenu(itemIdMenu: Int, eventKey: EventKeyClick): Boolean {
+        var itemMenu = LIST_CONTEXT_MENU.getEnumById(itemIdMenu)
+        when (itemMenu) {
+            LIST_CONTEXT_MENU.DELL -> {
+                viewState.showDialogConfirmDell(eventKey.id, model.getItemListMetaObj(eventKey.id)!!.description!!)
+            }
+            LIST_CONTEXT_MENU.SEND -> {
+                model.sendDocToServer(eventKey.id)
+                    .subscribe({
+                        viewState.showSnackbarViewMess("Ok")
+                    }, {
+                        viewState.showSnackbarViewError(it.message.toString())
+                    })
+            }
+        }
+
+        return true
+
+    }
+
+    fun dellDoc(id: Int) {
+        model.dellDoc(id)
+    }
 
 }
 
@@ -105,7 +158,16 @@ class Model {
     lateinit var interactorGetList: UseCaseGetListMetaObj
 
     @Inject
+    lateinit var interactorUseCaseGetMetaObj: UseCaseGetMetaObj
+
+    @Inject
     lateinit var interacLoadDocsFromServer: UseCaseGetListDocFromServer
+
+
+    @Inject
+    lateinit var interacSendCreatePalletToServer: UseCaseSendCreatePalletToServer
+
+    private var listDoc: MutableList<ItemListMetaObj?> = mutableListOf()
 
     init {
         App.appComponent.inject(this)
@@ -148,24 +210,13 @@ class Model {
         doc.save()
     }
 
-    fun createTestCreatePallet() {
-        var interactor = InteractorCreatorMetaObj(CREATE_PALLET)
-        var doc = interactor.create() as CreatePallet
-        doc.date = Date()
-        doc.status = NEW
-        doc.description = "Формирование паллет"
-
-        (0..Random().nextInt(5)).forEach {
-            var strProd = StringProduct()
-            strProd.nameProduct = "Product $it"
-            doc.stringProducts.add(strProd)
-        }
-
-        doc.save()
-    }
+    fun getItemListMetaObj(id: Int) = listDoc.get(id)
 
     fun getFlowableListItem() =
         interactorGetList.get()
+            .doOnNext {
+                listDoc = it.toMutableList()
+            }
             .map { it ->
                 it.map {
                     ItemList(
@@ -179,8 +230,23 @@ class Model {
 
     fun loadDocs() = interacLoadDocsFromServer.load()
 
+    fun dellDoc(id: Int) {
+        var guid: String = getItemListMetaObj(id)!!.getGuid()!!
+        var metaObj = interactorUseCaseGetMetaObj.get(guid)!!
+        metaObj.dell()
+    }
+
+    fun sendDocToServer(id: Int): Completable {
+        var guid: String = getItemListMetaObj(id)!!.getGuid()!!
+        var metaObj = interactorUseCaseGetMetaObj.get(guid)!!
+        return interacSendCreatePalletToServer.send(listOf(metaObj))
+    }
+
 
 }
+
+
+
 
 
 

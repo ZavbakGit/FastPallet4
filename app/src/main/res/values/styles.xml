@@ -26,7 +26,18 @@
         <!--<item name="android:windowEnterAnimation">@anim/slide_up</item>-->
         <!--<item name="android:windowExitAnimation">@anim/slide_down</item>-->
     </style>
+    <style name="item_description">
+        <item name="android:textSize">@dimen/item_description</item>
+    </style>
 
+    <style name="description">
+        <item name="android:textSize">@dimen/description</item>
+        <item name="android:textStyle">bold</item>
+
+    </style>
+    <style name="item">
+        <item name="android:textSize">@dimen/item</item>
+    </style>
 
 
 </resources>

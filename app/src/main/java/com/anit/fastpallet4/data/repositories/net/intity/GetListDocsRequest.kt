@@ -1,4 +1,4 @@
-package com.anit.fastpallet4.data.repositories.net.intity.getlistdocs
+package com.anit.fastpallet4.data.repositories.net.intity
 
 
 import com.anit.fastpallet4.data.repositories.net.intity.common.Reqest
