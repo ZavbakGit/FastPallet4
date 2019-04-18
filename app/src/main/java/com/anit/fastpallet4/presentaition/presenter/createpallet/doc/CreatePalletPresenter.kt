@@ -67,7 +67,7 @@ class Model(var guid: String) {
     lateinit var interactorGetDoc: UseCaseGetMetaObj
     var doc: CreatePallet? = null
     var behaviorSubjectViewModel = BehaviorSubject.create<ViewModel>()
-    var viewModel:ViewModel? = null
+    var viewModel: ViewModel? = null
 
 
     init {
@@ -80,19 +80,27 @@ class Model(var guid: String) {
 
     fun refreshViewModel() {
         doc = interactorGetDoc.get(guid) as CreatePallet
+        var list = doc!!.stringProducts.map {
+
+            var totalInfo = getTotalBoxInfoByPallet(it)
+
+            ItemList(
+                info = it.nameProduct,
+                left = "${it.count} / ${it.countBox} ",
+                right = "${totalInfo.weight} / ${totalInfo.countBox} / ${totalInfo.countPallet} ",
+                guid = it.guid
+            )
+        }
+
+
+        list.forEachIndexed { index, itemList ->
+            itemList.info = "${list.size - index}. ${itemList.info}"
+        }
+
+
         viewModel = ViewModel(
             info = "${doc?.description} ${doc?.guid ?: ""}",
-            list = doc!!.stringProducts.map {
-
-                var totalInfo = getTotalBoxInfoByPallet(it)
-
-                ItemList(
-                    info = it.nameProduct,
-                    left = "${it.count} / ${it.countBox} ",
-                    right = "${totalInfo.weight} / ${totalInfo.countBox} / ${totalInfo.countPallet} ",
-                    guid = it.guid
-                )
-            }
+            list = list
         )
 
         behaviorSubjectViewModel.onNext(viewModel!!)
