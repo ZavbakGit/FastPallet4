@@ -34,7 +34,7 @@
                     android:id="@+id/tv_info_doc_left"
                     android:layout_below="@+id/tv_info"
                     android:layout_margin="8dp"
-            />
+                    style="@style/description_left_right"/>
 
             <TextView
                     android:text="Документ"
@@ -44,6 +44,7 @@
                     android:layout_below="@+id/tv_info"
                     android:layout_alignParentRight="true"
                     android:layout_margin="8dp"
+                    style="@style/description_left_right"
             />
 
 

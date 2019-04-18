@@ -221,7 +221,8 @@ class Model {
                 it.map {
                     ItemList(
                         identifier = it!!.getGuid(),
-                        info = "${it.description} ${it.getGuid() ?: ""}",
+                        info = "${it.description}",
+                        left = "${it.status.fullName}",
                         type = it.type.id
 
                     )
@@ -241,6 +242,8 @@ class Model {
         var metaObj = interactorUseCaseGetMetaObj.get(guid)!!
         return interacSendCreatePalletToServer.send(listOf(metaObj))
     }
+
+    //TODo Надо тоже перейти на ViewModel и обновлять при отправке и т.д.
 
 
 }

@@ -10,4 +10,6 @@ interface BaseView:MvpView {
 
     @StateStrategyType(SkipStrategy::class)
     fun showSnackbarViewError(messager: CharSequence)
+
+
 }

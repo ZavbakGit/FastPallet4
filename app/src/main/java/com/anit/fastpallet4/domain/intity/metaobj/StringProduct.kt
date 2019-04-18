@@ -7,6 +7,7 @@ import java.util.*
 
 class StringProduct {
 
+    var guid: String? = null
     var number: String? = null
     var barcode: String? = null
 

@@ -8,6 +8,7 @@ import java.util.*
 class Pallet {
     var number: String? = null
     var barcode: String? = null
+    var guid:String? = null
 
     var dataChanged: Date? = null
     var count: Float = 0f

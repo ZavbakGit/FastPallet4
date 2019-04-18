@@ -38,6 +38,9 @@
     <style name="item">
         <item name="android:textSize">@dimen/item</item>
     </style>
+    <style name="description_left_right">
+        <item name="android:textSize">@dimen/description_left_right</item>
+    </style>
 
 
 </resources>

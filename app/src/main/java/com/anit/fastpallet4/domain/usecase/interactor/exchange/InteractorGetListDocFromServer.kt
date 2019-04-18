@@ -5,16 +5,17 @@ import com.anit.fastpallet4.data.repositories.net.DaoNet
 import com.anit.fastpallet4.data.repositories.net.intity.ItemConfim
 import com.anit.fastpallet4.domain.intity.MetaObj
 import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
+import com.anit.fastpallet4.domain.intity.metaobj.Status
 import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
 import com.anit.fastpallet4.domain.usecase.UseCaseGetListDocFromServer
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObjByGuidServer
-import com.anit.fastpallet4.maping.getStatusByString
+
 
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.util.*
+
 import javax.inject.Inject
 
 class InteractorGetListDocFromServer : UseCaseGetListDocFromServer {
@@ -72,7 +73,7 @@ class InteractorGetListDocFromServer : UseCaseGetListDocFromServer {
         return listDocument.map { document ->
             var status = listConfirm.find { it.guid == document.guidServer }?.status
 
-            document.status = getStatusByString(status)!!
+            document.status = Status.getStatusByString(status)!!
             return@map document
         }
     }

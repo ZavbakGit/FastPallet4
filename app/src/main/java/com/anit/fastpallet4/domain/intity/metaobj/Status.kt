@@ -15,5 +15,17 @@ enum class Status(val id: Int, val fullName: String) {
                 else -> null
             }
         }
+
+        fun getStatusByString(str: String?): Status? {
+            return when {
+                str.equals("Новый", true) -> Status.NEW
+                str.equals("Готов к выгрузке", true) -> Status.READY
+                str.equals("Выгружен", true) -> Status.LOADED
+                str.equals("Загружен", true) -> Status.UNLOADED
+                else -> null
+            }
+
+        }
+
     }
 }

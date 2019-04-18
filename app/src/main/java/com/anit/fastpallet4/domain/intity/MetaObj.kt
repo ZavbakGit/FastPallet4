@@ -46,12 +46,12 @@ abstract class MetaObj(){
             guid = UUID.randomUUID().toString()
         }
         dataChanged = Date()
-        useCaseMetaObj!!.save()
+        useCaseMetaObj.save()
     }
 
     open fun dell() {
         var useCaseMetaObj: UseCaseMetaObj = InteractorUseCaseMetaObj(this)
-        useCaseMetaObj!!.dell()
+        useCaseMetaObj.dell()
     }
 
     fun isNew(): Boolean {

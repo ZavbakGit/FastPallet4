@@ -11,6 +11,7 @@ import com.anit.fastpallet4.presentaition.ui.base.BaseView
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.doc.CreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.product.ProductCreatePalletFrScreen
+import com.anit.fastpallet4.presentaition.ui.util.getTotalBoxInfoByPallet
 import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
@@ -37,21 +38,21 @@ class CreatePalletPresenter(
         return true
     }
 
-    fun onStart(){
+    fun onStart() {
         model.refreshViewModel()
     }
 
     fun getViewModelFlowable() = model.behaviorSubjectViewModel
         .toFlowable(BackpressureStrategy.BUFFER)
 
-    fun onClickItem(index: Int?) {
+    fun onClickItem(index: Int) {
         index.let {
             router.navigateTo(
                 screens.getProductCreatePalletFrScreen(
                     ProductCreatePalletFrScreen
                         .InputParamObj(
                             guid = inputParamObj!!.guid,
-                            indexProd = index!!
+                            guidStringProduct = model.getStringProductsGuidByIndex(index)
                         )
                 )
             )
@@ -66,39 +67,35 @@ class Model(var guid: String) {
     lateinit var interactorGetDoc: UseCaseGetMetaObj
     var doc: CreatePallet? = null
     var behaviorSubjectViewModel = BehaviorSubject.create<ViewModel>()
+    var viewModel:ViewModel? = null
+
 
     init {
         App.appComponent.inject(this)
+    }
 
+    fun getStringProductsGuidByIndex(index: Int): String {
+        return viewModel!!.list.get(index).guid!!
     }
 
     fun refreshViewModel() {
         doc = interactorGetDoc.get(guid) as CreatePallet
-        behaviorSubjectViewModel.onNext(
-            ViewModel(
-                info = "${doc?.description} ${doc?.guid ?: ""}",
-                list = doc!!.stringProducts.map {
+        viewModel = ViewModel(
+            info = "${doc?.description} ${doc?.guid ?: ""}",
+            list = doc!!.stringProducts.map {
 
-                   var listBox =  it.pallets
-                        .flatMap {
-                            it.boxes
-                        }
-                        .map {
-                            BigDecimal(it.weight.toString())
-                        }
+                var totalInfo = getTotalBoxInfoByPallet(it)
 
-
-                   var weight =  listBox.fold(BigDecimal(0)){total:BigDecimal,next:BigDecimal ->total.add(next)}
-
-
-                    ItemList(
-                        info = it.nameProduct,
-                        left = "${it.count} / ${it.countBox}",
-                        right = "$weight / ${listBox.size}"
-                    )
-                }
-            )
+                ItemList(
+                    info = it.nameProduct,
+                    left = "${it.count} / ${it.countBox} ",
+                    right = "${totalInfo.weight} / ${totalInfo.countBox} / ${totalInfo.countPallet} ",
+                    guid = it.guid
+                )
+            }
         )
+
+        behaviorSubjectViewModel.onNext(viewModel!!)
     }
 
 

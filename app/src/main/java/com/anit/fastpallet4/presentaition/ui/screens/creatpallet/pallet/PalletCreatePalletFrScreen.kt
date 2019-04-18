@@ -4,6 +4,8 @@ package com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
+import android.widget.PopupMenu
 import com.anit.fastpallet4.R
 import com.anit.fastpallet4.presentaition.navigation.RouterProvider
 import com.anit.fastpallet4.presentaition.presenter.createpallet.pallet.PalletCreatePalletPresenter
@@ -15,6 +17,7 @@ import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
 import com.anit.fastpallet4.presentaition.ui.screens.dialogbox.BoxDialogFr
 import com.anit.fastpallet4.presentaition.ui.screens.dialogproduct.ProductDialogFr
 import com.anit.fastpallet4.presentaition.ui.screens.inventory.CreatePalletView
+import com.anit.fastpallet4.presentaition.ui.util.KeyKode
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import kotlinx.android.synthetic.main.doc_scr.*
@@ -23,9 +26,11 @@ import java.util.*
 
 class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
 
-    class InputParamObj(val guid: String,
-                        val indexProd:Int,
-                        val indexPallet:Int) : Serializable
+    class InputParamObj(
+        val guid: String,
+        val guidStringProduct: String,
+        val guidPallet: String
+    ) : Serializable
 
     var inputParamObj: Serializable? = null
 
@@ -73,6 +78,8 @@ class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
             presenter.getViewModelFlowable()
                 .subscribe {
                     tv_info.text = it.info
+                    tv_info_doc_left.text = it.left
+                    tv_info_doc_right.text = it.right
                 }
         )
 
@@ -83,7 +90,7 @@ class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
 
         bagDisposable.add(
             listFrag.publishSubjectItemClick
-                .subscribe{
+                .subscribe {
                     presenter.onClickItem(it)
                 }
         )
@@ -95,10 +102,21 @@ class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
                 }
             })
 
+
+        bagDisposable.add(
+            listFrag.publishSubjectKeyClick
+                .subscribe {
+                    if (it.keyCode == KeyKode.KEY_DELL) {
+                        presenter.onClickDell(it.id)
+                    }
+                }
+        )
+
         tv_info.setOnClickListener {
             presenter.onClickInfo()
         }
 
+        presenter.onStart()
 
     }
 
@@ -143,16 +161,13 @@ class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
         presenter.isShowDialog = false
     }
 
-
     override fun showDialogProduct(
-        title: String
-        , barcode: String?
-        , weightStartProduct: Int
-        , weightEndProduct: Int
-        , weightCoffProduct: Float
-
+        title: String,
+        barcode: String?,
+        weightStartProduct: Int,
+        weightEndProduct: Int,
+        weightCoffProduct: Float
     ) {
-
 
         if (!presenter.isShowDialog) {
             dialogProduct = ProductDialogFr.newInstance(
@@ -172,7 +187,13 @@ class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
         }
     }
 
-    override fun showDialogBox(title: String, barcode: String?, weight: Float, date: Date, index:Int?) {
+    override fun showDialogBox(
+        title: String,
+        barcode: String?,
+        weight: Float,
+        date: Date,
+        index: Int?
+    ) {
         if (!presenter.isShowDialog) {
             dialogBox = BoxDialogFr.newInstance(
                 BoxDialogFr.InputParamObj(
@@ -189,6 +210,18 @@ class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
 
             presenter.isShowDialog = true
         }
+    }
+
+    override fun showDialogConfirmDell(id: Int, title: String) {
+        AlertDialog.Builder(activity!!)
+            .setTitle(title)
+            .setMessage("Удалить")
+            .setNegativeButton(android.R.string.cancel, null) // dismisses by default
+            .setPositiveButton("Да") { dialog, which ->
+                presenter.dellBox(id)
+            }
+            .setOnCancelListener({ dialog -> "presenter.onErrorCancel()" })
+            .show()
     }
 
 }

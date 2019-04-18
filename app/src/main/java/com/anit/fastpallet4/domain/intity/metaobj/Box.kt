@@ -9,4 +9,5 @@ class Box {
     var barcode: String? = null
     var weight: Float = 0f
     var data: Date? = null
+    var guid: String? = null
 }

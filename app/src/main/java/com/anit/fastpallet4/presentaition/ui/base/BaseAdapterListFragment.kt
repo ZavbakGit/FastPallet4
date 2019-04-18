@@ -29,7 +29,7 @@ abstract class BaseAdapterListFragment<T>(val mContext: Context) : BaseAdapter()
         val viewHolder: Any
 
         if (convertView == null) {
-            val inflater = mContext?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val inflater = mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             convertView = inflater.inflate(getLayaot(), parent, false)
             viewHolder = createViewHolder(convertView)
             convertView!!.tag = viewHolder

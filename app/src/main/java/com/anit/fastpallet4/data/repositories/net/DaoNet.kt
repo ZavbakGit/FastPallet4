@@ -30,10 +30,9 @@ class DaoNet {
         App.appComponent.inject(this)
     }
 
-    fun confirmDocs(list: List<MetaObj>):Flowable<ConfirmResponse>
-    {
+    fun confirmDocs(list: List<MetaObj>): Flowable<ConfirmResponse> {
         var command = "command_confirm_doc_create_pallet"
-        var codeTsd = daoPref.getCodeTsd()
+
 
         return Flowable.just(1)
             .flatMap {
@@ -63,7 +62,7 @@ class DaoNet {
 
     fun getListDocs(): Flowable<List<MetaObj>> {
         var command = "command_get_doc_create_pallet"
-        var codeTsd = daoPref.getCodeTsd()
+
 
         return Flowable.just(1)
             .flatMap {
@@ -99,16 +98,16 @@ class DaoNet {
                 }
             }
             .map {
-                it as List<MetaObj>
+                it as? List<MetaObj>
             }
     }
 
 
     fun sendCreatePallet(list: List<MetaObj>): Flowable<Response> {
         var command = "command_send_doc_create_pallet"
-        var codeTsd = daoPref.getCodeTsd()
 
-       return Flowable.just(1)
+
+        return Flowable.just(1)
             .flatMap {
                 Flowable.just(daoPref.getCodeTsd())
             }
@@ -122,7 +121,7 @@ class DaoNet {
             .flatMap {
                 managerNet.reqest(
                     command = command,
-                    objReqest = SendDocumentsReqest(codeTSD = it.toString(),list = list),
+                    objReqest = SendDocumentsReqest(codeTSD = it.toString(), list = list),
                     classReqest = SendCreatePalletDocModelResponse::class.java
                 )
             }

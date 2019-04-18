@@ -50,10 +50,9 @@ class CreatePalletFrScreen : BaseFragment(), BaseView {
     override fun onStart() {
         super.onStart()
 
-        var listFrag = MyListFragment.newInstance(presenter.getViewModelFlowable()
-            .map {
-                it.list
-            })
+        var listFrag = MyListFragment.newInstance(
+            presenter.getViewModelFlowable().map { it.list }
+        )
 
         bagDisposable.add(
             presenter.getViewModelFlowable()
@@ -72,7 +71,7 @@ class CreatePalletFrScreen : BaseFragment(), BaseView {
 
         bagDisposable.add(
             listFrag.publishSubjectItemClick
-                .subscribe{
+                .subscribe {
                     presenter.onClickItem(it)
                 }
         )

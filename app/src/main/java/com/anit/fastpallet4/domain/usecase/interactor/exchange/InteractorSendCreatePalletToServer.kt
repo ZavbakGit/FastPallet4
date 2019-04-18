@@ -3,13 +3,16 @@ package com.anit.fastpallet4.domain.usecase.interactor.exchange
 import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.data.repositories.net.DaoNet
 import com.anit.fastpallet4.data.repositories.net.intity.ItemConfim
+import com.anit.fastpallet4.data.repositories.net.intity.ItemConfimResponse
+import com.anit.fastpallet4.data.repositories.net.intity.SendCreatePalletDocModelResponse
 import com.anit.fastpallet4.domain.intity.MetaObj
 import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
+import com.anit.fastpallet4.domain.intity.metaobj.Status
 import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
 import com.anit.fastpallet4.domain.usecase.UseCaseGetListDocFromServer
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObjByGuidServer
 import com.anit.fastpallet4.domain.usecase.UseCaseSendCreatePalletToServer
-import com.anit.fastpallet4.maping.getStatusByString
+
 
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -29,13 +32,23 @@ class InteractorSendCreatePalletToServer : UseCaseSendCreatePalletToServer {
         App.appComponent.inject(this)
     }
 
+
+    fun saveStatus(list:List<ItemConfimResponse>){
+        list.forEach {
+            var metaObj = getMetaObjByGuidServer.get(it.guid!!)
+            var stattus = Status.getStatusByString(it.status)
+            metaObj!!.status = stattus!!
+            metaObj.save()
+        }
+    }
+
     override fun send(list:List<MetaObj>): Completable {
         return daoNet.sendCreatePallet(list)
-            .map {
-                it
-            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {
+                saveStatus((it as SendCreatePalletDocModelResponse).listConfirm)
+            }
             .ignoreElements()
     }
 

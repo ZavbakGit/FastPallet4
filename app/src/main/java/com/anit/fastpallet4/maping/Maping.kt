@@ -119,7 +119,7 @@ class Maping {
 
                 var doc = CreatePallet()
                 doc.guidServer = docResponse.guid
-                doc.status = getStatusByString(docResponse.status)!!
+                doc.status = Status.getStatusByString(docResponse.status)!!
                 doc.number = docResponse.number
                 doc.date = docResponse.date
                 doc.description = docResponse.description

@@ -3,4 +3,5 @@
     <dimen name="item_description">20sp</dimen>
     <dimen name="item">16sp</dimen>
     <dimen name="description">20sp</dimen>
+    <dimen name="description_left_right">16sp</dimen>
 </resources>

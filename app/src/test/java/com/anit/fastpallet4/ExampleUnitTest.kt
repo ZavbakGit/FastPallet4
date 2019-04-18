@@ -22,19 +22,14 @@ import com.google.gson.ExclusionStrategy
  */
 class ExampleUnitTest {
 
+    data class My(val date:Date)
 
     @Test
     fun addition_isCorrect() {
-        var listDb = listOf("Вася","Петя")
-        var listServ = listOf("Вася","Вася","Саша")
-
-       listServ.distinct()
 
 
 
-        listServ.filter { it !in listDb }
-
-
+        listOf(My(Date()),My(Date())).sortedBy { it.date }.map {  }
 
 
         assertEquals(4, 2 + 2)

@@ -45,8 +45,6 @@ open abstract class BaseListFragment<T> : ListFragment() {
             val position = listView.getSelectedItemPosition()
 
             if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-
-
                 publishSubjectKeyClick.onNext(EventKeyClick(keyCode = keyKode,id = position))
             }
             false

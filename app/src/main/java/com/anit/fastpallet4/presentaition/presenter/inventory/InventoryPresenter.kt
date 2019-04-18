@@ -40,14 +40,14 @@ class InventoryPresenter(
         barcode.let {
             var weight = getWeightByBarcode(
                 barcode = it!!,
-                start = model.doc.stringProduct.weightStartProduct,
-                finish = model.doc.stringProduct.weightEndProduct,
-                coff = model.doc.stringProduct.edCoff
+                start = model.doc!!.stringProduct.weightStartProduct,
+                finish = model.doc!!.stringProduct.weightEndProduct,
+                coff = model.doc!!.stringProduct.edCoff
             )
 
             if (weight == 0f) {
                 viewState.showSnackbarViewError("Не верный вес!")
-            } else if (it.length != model.doc.stringProduct.barcode?.length) {
+            } else if (it.length != model.doc!!.stringProduct.barcode?.length) {
                 viewState.showSnackbarViewError("Не верная длинна штрихкода!")
             } else {
                 model.addBox(weight, it)
@@ -56,12 +56,12 @@ class InventoryPresenter(
 
     }
 
-    fun onClickItem(index: Int?) {
+    fun onClickItem(index: Int) {
         viewState.showDialogBox(
-            title = model.doc?.stringProduct?.nameProduct ?: "",
-            weight = model.getBox(index!!).weight,
-            date = model.getBox(index!!).data ?: Date(),
-            barcode = model.getBox(index!!).barcode,
+            title = model.doc!!.stringProduct.nameProduct ?: "",
+            weight = model.getBox(index).weight,
+            date = model.getBox(index).data ?: Date(),
+            barcode = model.getBox(index).barcode,
             index = index
 
         )
@@ -70,7 +70,7 @@ class InventoryPresenter(
     fun onClickInfo() {
         var doc = model.doc
         viewState.showDialogProduct(
-            title = doc.guid ?: "",
+            title = doc!!.guid ?: "",
             weightStartProduct = doc.stringProduct.weightStartProduct,
             weightEndProduct = doc.stringProduct.weightEndProduct,
             weightCoffProduct = doc.stringProduct.weightCoffProduct,
@@ -94,9 +94,9 @@ class InventoryPresenter(
     }
 
     fun saveBox(barcode: String?, weight: Float, index: Int?) {
-        if(weight == 0f){
+        if (weight == 0f) {
             viewState.showSnackbarViewError("Не верный вес!")
-        }else{
+        } else {
             model.saveBox(
                 index = index,
                 barcode = barcode,
@@ -108,31 +108,33 @@ class InventoryPresenter(
 
 }
 
-class Model(guid: String) {
+class Model(var guidDoc: String) {
 
     @Inject
     lateinit var interactorGetDoc: UseCaseGetMetaObj
-    var doc: InventoryPallet
+    var doc: InventoryPallet? = null
     var behaviorSubjectViewModel = BehaviorSubject.create<ViewModel>()
+
+    var viewModel: ViewModel? = null
 
     init {
         App.appComponent.inject(this)
-        doc = interactorGetDoc.get(guid) as InventoryPallet
-        refreshViewModel()
-
     }
 
     fun refreshViewModel() {
-        behaviorSubjectViewModel.onNext(
-            ViewModel(
-                info = "${doc?.description} ${doc?.guid ?: ""}",
-                list = doc.stringProduct.boxes.map {
-                    ItemList(
-                        info = it.weight.toString()
-                    )
-                }
+        doc = interactorGetDoc.get(guidDoc) as InventoryPallet
+
+        var list = doc!!.stringProduct.boxes.map {
+            ItemList(
+                info = it.weight.toString()
             )
+        }
+
+        viewModel = ViewModel(
+            info = "${doc!!.description}",
+            list = list
         )
+        behaviorSubjectViewModel.onNext(viewModel!!)
     }
 
     fun addBox(weight: Float, barcode: String?) {
@@ -142,35 +144,35 @@ class Model(guid: String) {
         box.data = Date()
         box.weight = weight
 
-        doc.addBox(box)
-        doc.save()
+        doc!!.addBox(box)
+        doc!!.save()
         refreshViewModel()
     }
 
     fun dellBarcode(index: Int) {
-        doc.dellBox(index)
-        doc.save()
+        doc!!.dellBox(index)
+        doc!!.save()
         refreshViewModel()
     }
 
     fun getBox(index: Int): Box {
-        return doc.getBox(index)
+        return doc!!.getBox(index)
     }
 
     fun saveBox(index: Int?, weight: Float, barcode: String?) {
-        var box:Box?
-        if (index != null){
+        var box: Box?
+        if (index != null) {
             box = getBox(index)
-        }else{
+        } else {
             box = Box()
-            doc.addBox(box)
+            doc!!.addBox(box)
         }
 
         box.barcode = barcode
         box.data = Date()
         box.weight = weight
 
-        doc.save()
+        doc!!.save()
         refreshViewModel()
     }
 
@@ -181,11 +183,11 @@ class Model(guid: String) {
         , weightCoffProduct: Float
     ) {
 
-        doc.stringProduct.barcode = barcode
-        doc.stringProduct.weightStartProduct = weightStartProduct
-        doc.stringProduct.weightEndProduct = weightEndProduct
-        doc.stringProduct.weightCoffProduct = weightCoffProduct
-        doc.save()
+        doc!!.stringProduct.barcode = barcode
+        doc!!.stringProduct.weightStartProduct = weightStartProduct
+        doc!!.stringProduct.weightEndProduct = weightEndProduct
+        doc!!.stringProduct.weightCoffProduct = weightCoffProduct
+        doc!!.save()
         refreshViewModel()
 
     }

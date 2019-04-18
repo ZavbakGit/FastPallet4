@@ -3,8 +3,10 @@ package com.anit.fastpallet4.presentaition.presenter.createpallet.product
 
 import android.annotation.SuppressLint
 import com.anit.fastpallet4.app.App
+import com.anit.fastpallet4.common.formatDate
 import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
 import com.anit.fastpallet4.domain.intity.metaobj.Pallet
+import com.anit.fastpallet4.domain.intity.metaobj.Status
 import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
 import com.anit.fastpallet4.domain.utils.getNumberDocByBarCode
@@ -14,12 +16,15 @@ import com.anit.fastpallet4.presentaition.ui.base.BaseView
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.product.ProductCreatePalletFrScreen
+import com.anit.fastpallet4.presentaition.ui.screens.inventory.CreatePalletProductView
+import com.anit.fastpallet4.presentaition.ui.util.getTotalBoxInfoByPallet
 import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.subjects.BehaviorSubject
 import ru.terrakok.cicerone.Router
+import java.math.BigDecimal
 import java.util.*
 import javax.inject.Inject
 
@@ -28,7 +33,7 @@ class ProductCreatePalletPresenter(
     router: Router,
     private val inputParamObj: ProductCreatePalletFrScreen.InputParamObj?
 
-) : BasePresenter<BaseView>(router) {
+) : BasePresenter<CreatePalletProductView>(router) {
 
     init {
         App.appComponent.inject(this)
@@ -36,12 +41,16 @@ class ProductCreatePalletPresenter(
 
     private val model = Model(
         inputParamObj!!.guid,
-        inputParamObj.indexProd
+        inputParamObj.guidStringProduct
     )
 
     override fun onBackPressed(): Boolean {
         router.exit()
         return true
+    }
+
+    fun onStart() {
+        model.refreshViewModel()
     }
 
     fun getViewModelFlowable() = model.behaviorSubjectViewModel
@@ -57,41 +66,51 @@ class ProductCreatePalletPresenter(
 
     }
 
-    fun onClickItem(index: Int?) {
-        index.let {
-            router.navigateTo(
-                screens.getPalletCreatePalletFrScreen(
-                    PalletCreatePalletFrScreen
-                        .InputParamObj(
-                            guid = inputParamObj!!.guid,
-                            indexProd = inputParamObj.indexProd,
-                            indexPallet = index!!
-                        )
-                )
+    fun onClickItem(index: Int) {
+        router.navigateTo(
+            screens.getPalletCreatePalletFrScreen(
+                PalletCreatePalletFrScreen
+                    .InputParamObj(
+                        guid = inputParamObj!!.guid,
+                        guidStringProduct = inputParamObj.guidStringProduct,
+                        guidPallet = model.getPalletGuidByIndex(index)
+                    )
             )
+        )
+
+    }
+
+    fun onClickDell(id: Int) {
+        when (model.doc!!.status) {
+            Status.NEW, Status.LOADED -> {
+                var guigPallet = model.getPalletGuidByIndex(id)
+                val pallet = model.getPallet(guigPallet)
+                var count = pallet.boxes.size
+                viewState.showDialogConfirmDell(id, "Удалить паллету? \n Коробок - $count")
+            }
+            else -> viewState.showSnackbarViewError("Нельзя Удалять!")
         }
     }
 
-
+    fun dellPallet(id: Int) {
+        model.dellPallet(id)
+    }
 }
 
 class Model(
-    guid: String
-    , indexProduct: Int
+    var guidDoc: String,
+    var guidStringProduct: String
 ) {
 
     @Inject
     lateinit var interactorGetDoc: UseCaseGetMetaObj
-    var doc: CreatePallet
-    var stringProduct: StringProduct
+    var doc: CreatePallet? = null
+    var stringProduct: StringProduct? = null
     var behaviorSubjectViewModel = BehaviorSubject.create<ViewModel>()
+    var viewModel: ViewModel? = null
 
     init {
         App.appComponent.inject(this)
-        doc = interactorGetDoc.get(guid) as CreatePallet
-        stringProduct = doc.stringProducts.get(indexProduct)
-
-        refreshViewModel()
     }
 
 
@@ -111,15 +130,14 @@ class Model(
                 var pallet = Pallet()
                 pallet.barcode = it
                 pallet.number = getNumberDocByBarCode(it)
+                pallet.dataChanged = Date()
 
                 return@map pallet
             }
             .flatMap { pallet ->
-                var listPallet = doc.stringProducts
+                var listPallet = doc!!.stringProducts
                     .flatMap {
-                        it.pallets.map {
-                            it
-                        }
+                        it.pallets
                     }
 
                 if (listPallet.filter { it.number.equals(pallet.number, true) }.size > 0) {
@@ -127,32 +145,63 @@ class Model(
                 } else {
                     return@flatMap Flowable.just(pallet)
                 }
-
             }
             .doOnNext {
-                stringProduct.addPallet(it as Pallet)
-                doc.save()
+                stringProduct!!.addPallet(it as Pallet)
+                doc!!.save()
                 refreshViewModel()
             }
             .ignoreElements()
     }
 
     fun refreshViewModel() {
+        doc = interactorGetDoc.get(guidDoc) as CreatePallet
+        stringProduct = getStringProducts(guidStringProduct)
 
 
-        behaviorSubjectViewModel.onNext(
-            ViewModel(
-                info = "${stringProduct?.nameProduct}",
-                list = stringProduct.pallets
-                    .map {
-                        ItemList(
-                            info = it.number
-                        )
-                    }
-            )
+        var totalInfoStr = getTotalBoxInfoByPallet(stringProduct!!)
+
+        viewModel = ViewModel(
+            info = "${stringProduct?.nameProduct}",
+            left = "${stringProduct!!.count} / ${stringProduct!!.countBox}",
+            right = "${totalInfoStr.weight} / ${totalInfoStr.countBox} / ${totalInfoStr.countPallet}",
+            list = stringProduct!!.pallets
+                .map {
+
+                    var totalInfoPall = getTotalBoxInfoByPallet(it)
+
+                    ItemList(
+                        info = it.number,
+                        left = "${formatDate(it.dataChanged)}",
+                        right = "${totalInfoPall.weight} / ${totalInfoPall.countBox} / ${totalInfoPall.countPallet} ",
+                        data = it.dataChanged,
+                        guid = it.guid
+                    )
+                }
+                .sortedByDescending { it.data }
         )
+
+        behaviorSubjectViewModel.onNext(viewModel!!)
     }
 
+    fun getStringProducts(guid: String): StringProduct {
+        return doc!!.stringProducts.find { it.guid.equals(guid) }!!
+    }
+
+    fun getPalletGuidByIndex(index: Int): String {
+        return viewModel!!.list.get(index).guid!!
+    }
+
+    fun getPallet(guid: String): Pallet {
+        return stringProduct!!.pallets.find { it.guid == guid }!!
+    }
+
+    fun dellPallet(id: Int) {
+        var guid = getPalletGuidByIndex(id)
+        stringProduct!!.pallets.removeAll { it.guid == guid }
+        doc!!.save()
+        refreshViewModel()
+    }
 
 }
 
