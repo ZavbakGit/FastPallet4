@@ -57,13 +57,17 @@ class ProductCreatePalletPresenter(
         .toFlowable(BackpressureStrategy.BUFFER)
 
     fun readBarcode(barcode: String) {
-        model.createPaletByBarcode(barcode)
-            .subscribe({
-                viewState.showSnackbarViewMess("Ок")
-            }, {
-                viewState.showSnackbarViewError(it.message.toString())
-            })
-
+        when (model.doc!!.status) {
+            Status.NEW, Status.LOADED -> {
+                model.createPaletByBarcode(barcode)
+                    .subscribe({
+                        //viewState.showSnackbarViewMess("Ок")
+                    }, {
+                        viewState.showSnackbarViewError(it.message.toString())
+                    })
+            }
+            else -> viewState.showSnackbarViewError("Нельзя Изменять!")
+        }
     }
 
     fun onClickItem(index: Int) {

@@ -54,21 +54,27 @@ class PalletCreatePalletPresenter(
         .toFlowable(BackpressureStrategy.BUFFER)
 
     fun readBarcode(barcode: String?) {
-        barcode.let {
-            var weight = getWeightByBarcode(
-                barcode = it!!,
-                start = model.stringProduct!!.weightStartProduct,
-                finish = model.stringProduct!!.weightEndProduct,
-                coff = model.stringProduct!!.weightCoffProduct
-            )
+        when (model.doc!!.status) {
+            NEW, LOADED -> {
+                barcode.let {
+                    var weight = getWeightByBarcode(
+                        barcode = it!!,
+                        start = model.stringProduct!!.weightStartProduct,
+                        finish = model.stringProduct!!.weightEndProduct,
+                        coff = model.stringProduct!!.weightCoffProduct
+                    )
 
-            if (weight == 0f) {
-                viewState.showSnackbarViewError("Не верный вес!")
-            } else if (it.length != model.stringProduct!!.barcode?.length) {
-                viewState.showSnackbarViewError("Не верная длинна штрихкода!")
-            } else {
-                model.addBox(weight, it)
+                    if (weight == 0f) {
+                        viewState.showSnackbarViewError("Не верный вес!")
+                    } else if (it.length != model.stringProduct!!.barcode?.length) {
+                        viewState.showSnackbarViewError("Не верная длинна штрихкода!")
+                    } else {
+                        model.addBox(weight, it)
+                    }
+                }
+
             }
+            else -> viewState.showSnackbarViewError("Нельзя Изменять!")
         }
     }
 
