@@ -14,8 +14,12 @@ class CreatePallet : MetaObj(type = Type.CREATE_PALLET) {
         stringProducts.add(stringProduct)
     }
 
-    fun dellStringProduct(index: Int) {
-        stringProducts.removeAt(index)
+    fun dellStringProductByGuid(guid: String) {
+        stringProducts.removeAll { it.guid.equals(guid,true) }
+    }
+
+    fun getStringProductByGuid(guid: String):StringProduct? {
+       return stringProducts.find { it.guid.equals(guid,true) }
     }
 
     override fun save() {

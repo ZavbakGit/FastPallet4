@@ -4,6 +4,11 @@ package com.anit.fastpallet4.presentaition.ui.screens.inventory
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.anit.fastpallet4.R
 
 import com.anit.fastpallet4.presentaition.navigation.RouterProvider
@@ -13,6 +18,8 @@ import com.anit.fastpallet4.presentaition.ui.base.MyListFragment
 import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
 import com.anit.fastpallet4.presentaition.ui.screens.dialogbox.BoxDialogFr
 import com.anit.fastpallet4.presentaition.ui.screens.dialogproduct.ProductDialogFr
+import com.anit.fastpallet4.presentaition.ui.util.EventKeyClick
+import com.anit.fastpallet4.presentaition.ui.util.KeyKode
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import kotlinx.android.synthetic.main.doc_scr.*
@@ -69,6 +76,8 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
             presenter.getViewModelFlowable()
                 .subscribe {
                     tv_info.text = it.info
+                    tv_info_doc_right.text = it.right
+                    tv_info_doc_left.text = it.left
                 }
         )
 
@@ -92,13 +101,54 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
                 }
             })
 
-        tv_info.setOnClickListener {
+
+
+        bagDisposable.add(
+            listFrag.publishSubjectKeyClick
+                .subscribe {
+                    if (it.keyCode == KeyKode.KEY_DELL) {
+                        presenter.onClickDell(it.id)
+                    }
+                    if (it.keyCode == KeyKode.KEY_LOAD) {
+                        presenter.loadInfoPallet()
+                    }
+                }
+        )
+
+        header_doc.setOnKeyListener { view, keyKode, keyEvent ->
+            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyKode == KeyKode.KEY_LOAD) {
+                    presenter.loadInfoPallet()
+                    return@setOnKeyListener true
+                }
+            }
+            return@setOnKeyListener false
+        }
+
+        //Это для срабатывания если пустая
+        header_doc.requestFocus()
+
+
+        header_doc.setOnClickListener {
             presenter.onClickInfo()
         }
 
 
+        presenter.onStart()
+
+
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        var view = super.onCreateView(inflater, container, savedInstanceState)
+        var root = view!!.findViewById<View>(R.id.lay_root)
+        //root.setFocusableInTouchMode(true)
+        //root.requestFocus()
+
+
+
+        return view
+    }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -142,7 +192,6 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
         presenter.isShowDialog = false
     }
 
-
     override fun showDialogProduct(
         title: String
         , barcode: String?
@@ -171,7 +220,7 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
         }
     }
 
-    override fun showDialogBox(title: String, barcode: String?, weight: Float, date: Date,index:Int?) {
+    override fun showDialogBox(title: String, barcode: String?, weight: Float, date: Date, index: Int?) {
         if (!presenter.isShowDialog) {
             dialogBox = BoxDialogFr.newInstance(
                 BoxDialogFr.InputParamObj(
@@ -190,6 +239,17 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
         }
     }
 
+    override fun showDialogConfirmDell(id: Int, title: String) {
+        AlertDialog.Builder(activity!!)
+            .setTitle(title)
+            .setMessage("Удалить")
+            .setNegativeButton(android.R.string.cancel, null) // dismisses by default
+            .setPositiveButton("Да") { dialog, which ->
+                presenter.dellBox(id)
+            }
+            .setOnCancelListener({ dialog -> "presenter.onErrorCancel()" })
+            .show()
+    }
 
 
 }

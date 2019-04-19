@@ -46,17 +46,16 @@ class CreatePalletPresenter(
         .toFlowable(BackpressureStrategy.BUFFER)
 
     fun onClickItem(index: Int) {
-        index.let {
-            router.navigateTo(
-                screens.getProductCreatePalletFrScreen(
-                    ProductCreatePalletFrScreen
-                        .InputParamObj(
-                            guid = inputParamObj!!.guid,
-                            guidStringProduct = model.getStringProductsGuidByIndex(index)
-                        )
-                )
+        router.navigateTo(
+            screens.getProductCreatePalletFrScreen(
+                ProductCreatePalletFrScreen
+                    .InputParamObj(
+                        guid = inputParamObj!!.guid,
+                        guidStringProduct = model.getStringProductByIndex(index).guid!!
+                    )
             )
-        }
+        )
+
     }
 
 }
@@ -74,8 +73,9 @@ class Model(var guid: String) {
         App.appComponent.inject(this)
     }
 
-    fun getStringProductsGuidByIndex(index: Int): String {
-        return viewModel!!.list.get(index).guid!!
+    fun getStringProductByIndex(index: Int): StringProduct {
+        var guid = viewModel!!.list.get(index).guid!!
+        return doc!!.getStringProductByGuid(guid)!!
     }
 
     fun refreshViewModel() {

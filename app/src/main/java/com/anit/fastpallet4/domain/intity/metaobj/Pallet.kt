@@ -20,7 +20,11 @@ class Pallet {
         boxes.add(box)
     }
 
-    fun dellBox(index: Int) {
-        boxes.removeAt(index)
+    fun dellBoxByGuid(guid: String) {
+        boxes.removeAll { it.guid.equals(guid,true) }
+    }
+
+    fun getBoxByGuid(guid:String):Box?{
+      return  boxes.find { it.guid.equals(guid,true)}
     }
 }

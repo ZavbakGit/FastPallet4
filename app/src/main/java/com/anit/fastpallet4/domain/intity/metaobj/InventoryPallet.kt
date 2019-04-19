@@ -8,22 +8,10 @@ import java.util.*
 
 class InventoryPallet : MetaObj(type = INVENTORY_PALLET) {
 
-    var barcodePallet: String? = null
+
     var numberPallet: String? = null
-    var stringProduct: StringProduct =
-        StringProduct()
-
-    fun addBox(box: Box) {
-        stringProduct.boxes.add(box)
-    }
-
-    fun dellBox(index: Int) {
-        stringProduct.boxes.removeAt(index)
-    }
-
-    fun getBox(index: Int): Box {
-        return stringProduct.boxes.get(index)
-    }
+    var stringProduct: StringProduct = StringProduct()
+    var barcodePallet: String? = null
 
     override fun save() {
         stringProduct.pallets

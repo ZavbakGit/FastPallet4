@@ -16,6 +16,7 @@ class StringProduct {
     var codeProduct: String? = null
     var ed: String? = null
 
+    var weightBarcode: String? = null
     var weightStartProduct: Int = 0
     var weightEndProduct: Int = 0
     var weightCoffProduct: Float = 0f
@@ -41,12 +42,21 @@ class StringProduct {
         boxes.add(box)
     }
 
-    fun dellBox(index: Int) {
-        boxes.removeAt(index)
+    fun dellPalletByGuid(guid: String) {
+        pallets.removeAll { it.guid.equals(guid,true) }
     }
 
-    fun dellPallet(index: Int) {
-        pallets.removeAt(index)
+    fun dellBoxByGuid(guid: String) {
+        boxes.removeAll { it.guid.equals(guid,true) }
+    }
+
+    fun getPalletByGuid(guid:String):Pallet?{
+        return  pallets.find { it.guid.equals(guid,true)}
+    }
+
+
+    fun getBoxByGuid(guid:String):Box?{
+        return  boxes.find { it.guid.equals(guid,true)}
     }
 
 }

@@ -79,11 +79,12 @@ class PalletCreatePalletPresenter(
     }
 
     fun onClickItem(index: Int) {
+        var box = model.getBox(index)
         viewState.showDialogBox(
             title = model.stringProduct!!.nameProduct ?: "",
-            weight = model.getBox(index).weight,
-            date = model.getBox(index).data ?: Date(),
-            barcode = model.getBox(index).barcode,
+            weight = box!!.weight,
+            date = box.data ?: Date(),
+            barcode = box.barcode,
             index = index
 
         )
@@ -165,12 +166,12 @@ class Model(
 
     }
 
-    fun getStringProducts(guid: String): StringProduct {
-        return doc!!.stringProducts.find { it.guid == guid }!!
+    fun getStringProducts(guid: String): StringProduct? {
+        return doc!!.getStringProductByGuid(guid)
     }
 
-    fun getPallet(guid: String): Pallet {
-        return stringProduct!!.pallets.find { it.guid == guid }!!
+    fun getPallet(guid: String): Pallet? {
+        return stringProduct!!.getPalletByGuid(guid)
     }
 
     fun refreshViewModel() {
@@ -205,15 +206,15 @@ class Model(
     }
 
     fun dellBox(index: Int) {
-        var guid = getBox(index).guid
-        pallet!!.boxes.removeAll { it.guid == guid }
+        var guid = getBox(index)!!.guid
+        pallet!!.dellBoxByGuid(guid!!)
         doc!!.save()
         refreshViewModel()
     }
 
-    fun getBox(index: Int): Box {
+    fun getBox(index: Int): Box? {
         var guid = viewModel!!.list.get(index).guid
-        return pallet!!.boxes.find { it.guid!!.equals(guid) }!!
+        return pallet!!.getBoxByGuid(guid!!)
     }
 
     fun saveProduct(
@@ -245,7 +246,7 @@ class Model(
             pallet!!.boxes.add(box)
         }
 
-        box.barcode = barcode
+        box!!.barcode = barcode
         box.data = Date()
         box.weight = weight
 

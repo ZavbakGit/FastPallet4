@@ -13,6 +13,7 @@ import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetFlowab
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObjByGuidServer
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseMetaObj
+import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorGetInfoPallet
 import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorGetListDocFromServer
 import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorSendCreatePalletToServer
 import com.anit.fastpallet4.presentaition.navigation.LocalNavigationModule
@@ -69,6 +70,7 @@ interface AppComponent {
     fun inject(daoNet: DaoNet)
     fun inject(interactorUseCaseGetMetaObjByGuidServer: InteractorUseCaseGetMetaObjByGuidServer)
     fun inject(interactorSendCreatePalletToServer: InteractorSendCreatePalletToServer)
+    fun inject(interactorGetInfoPallet: InteractorGetInfoPallet)
 
 }
 

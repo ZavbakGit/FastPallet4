@@ -13,6 +13,7 @@ import org.junit.Assert.*
 import java.util.*
 import com.google.gson.FieldAttributes
 import com.google.gson.ExclusionStrategy
+import io.reactivex.Completable
 
 
 /**
@@ -30,6 +31,15 @@ class ExampleUnitTest {
 
 
         listOf(My(Date()),My(Date())).sortedBy { it.date }.map {  }
+
+        Completable.fromAction{
+
+           var r = 5/0
+        }.subscribe({
+            println("111")
+        },{
+            println("222")
+        })
 
 
         assertEquals(4, 2 + 2)

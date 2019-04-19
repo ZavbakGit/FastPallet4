@@ -19,6 +19,7 @@ abstract class MetaObj(){
     var number: String? = null
 
 
+
     var date: Date? = null
 
 

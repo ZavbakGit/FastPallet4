@@ -2,16 +2,28 @@ package com.anit.fastpallet4.presentaition.presenter.inventory
 
 
 import com.anit.fastpallet4.app.App
+import com.anit.fastpallet4.common.formatDate
+import com.anit.fastpallet4.domain.intity.extra.InfoPallet
 import com.anit.fastpallet4.domain.intity.metaobj.Box
 import com.anit.fastpallet4.domain.intity.metaobj.InventoryPallet
+import com.anit.fastpallet4.domain.intity.metaobj.Pallet
+import com.anit.fastpallet4.domain.intity.metaobj.Status
+import com.anit.fastpallet4.domain.usecase.UseCaseGetInfoPallet
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
+import com.anit.fastpallet4.domain.utils.getDecimalStr
+import com.anit.fastpallet4.domain.utils.getNumberDocByBarCode
 import com.anit.fastpallet4.domain.utils.getWeightByBarcode
+import com.anit.fastpallet4.domain.utils.isPallet
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
 import com.anit.fastpallet4.presentaition.ui.screens.inventory.InventoryFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.inventory.InventoryView
+import com.anit.fastpallet4.presentaition.ui.util.getTotalBoxInfoByPallet
 import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
+import io.reactivex.Completable
+import io.reactivex.Flowable
+import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import ru.terrakok.cicerone.Router
 import java.util.*
@@ -33,44 +45,75 @@ class InventoryPresenter(
         return true
     }
 
+    fun onStart() {
+        model.refreshViewModel()
+    }
+
     fun getViewModelFlowable() = model.behaviorSubjectViewModel
         .toFlowable(BackpressureStrategy.BUFFER)
 
     fun readBarcode(barcode: String?) {
-        barcode.let {
-            var weight = getWeightByBarcode(
-                barcode = it!!,
-                start = model.doc!!.stringProduct.weightStartProduct,
-                finish = model.doc!!.stringProduct.weightEndProduct,
-                coff = model.doc!!.stringProduct.edCoff
-            )
+        when (model.doc!!.status) {
+            Status.NEW, Status.LOADED -> {
+                barcode.let {
+                    // Если паллета
+                    if (isPallet(barcode!!)) {
+                        if (!model.doc!!.numberPallet.isNullOrEmpty()) {
+                            viewState.showSnackbarViewError("Палета уже назначена!\n ${model.doc!!.numberPallet}")
+                        } else {
+                            try {
+                                var number = getNumberDocByBarCode(barcode)
+                                model.savePallet(number, barcode)
+                            } catch (e: Throwable) {
+                                viewState.showSnackbarViewError("Ошибка в номере паллеты!")
+                            }
+                        }
+                    } else {
+                        //Если коробка
+                        if (model.doc!!.numberPallet.isNullOrEmpty()) {
+                            viewState.showSnackbarViewError("Сканируйте паллету!")
+                        } else {
+                            var weight = getWeightByBarcode(
+                                barcode = it!!,
+                                start = model.doc!!.stringProduct!!.weightStartProduct,
+                                finish = model.doc!!.stringProduct!!.weightEndProduct,
+                                coff = model.doc!!.stringProduct!!.weightCoffProduct
+                            )
 
-            if (weight == 0f) {
-                viewState.showSnackbarViewError("Не верный вес!")
-            } else if (it.length != model.doc!!.stringProduct.barcode?.length) {
-                viewState.showSnackbarViewError("Не верная длинна штрихкода!")
-            } else {
-                model.addBox(weight, it)
+                            if (weight == 0f) {
+                                viewState.showSnackbarViewError("Не верный вес!")
+                            } else if (it.length != model.doc!!.stringProduct!!.barcode?.length) {
+                                viewState.showSnackbarViewError("Не верная длинна штрихкода!")
+                            } else {
+                                model.addBox(weight, it)
+                            }
+                        }
+
+                    }
+                }
+
             }
+            else -> viewState.showSnackbarViewError("Нельзя Изменять!")
         }
+
 
     }
 
     fun onClickItem(index: Int) {
+        var box = model.getBoxByIndex(index)
         viewState.showDialogBox(
             title = model.doc!!.stringProduct.nameProduct ?: "",
-            weight = model.getBox(index).weight,
-            date = model.getBox(index).data ?: Date(),
-            barcode = model.getBox(index).barcode,
+            weight = box.weight,
+            date = box.data ?: Date(),
+            barcode = box.barcode,
             index = index
-
         )
     }
 
     fun onClickInfo() {
         var doc = model.doc
         viewState.showDialogProduct(
-            title = doc!!.guid ?: "",
+            title = doc!!.stringProduct.nameProduct ?: "",
             weightStartProduct = doc.stringProduct.weightStartProduct,
             weightEndProduct = doc.stringProduct.weightEndProduct,
             weightCoffProduct = doc.stringProduct.weightCoffProduct,
@@ -106,15 +149,56 @@ class InventoryPresenter(
 
     }
 
+    fun onClickDell(id: Int) {
+        when (model.doc!!.status) {
+            Status.NEW, Status.LOADED -> {
+                viewState.showDialogConfirmDell(id, "Удалить коробку?")
+            }
+            else -> viewState.showSnackbarViewError("Нельзя Удалять!")
+        }
+
+    }
+
+    fun dellBox(id: Int) {
+        model.dellBoxById(id)
+    }
+
+
+    fun loadInfoPallet() {
+        if (model.doc!!.numberPallet.isNullOrEmpty()) {
+            viewState.showSnackbarViewError("Сканируйте паллету!")
+        } else {
+            model.getInfoPalletFromServer()
+                .doOnSubscribe { viewState.showSnackbarViewMess("Запрос") }
+                .doOnDispose {  viewState.showSnackbarViewMess("Конец") }
+                .subscribe({
+                    var info = it.find { it.code.equals(model.doc!!.numberPallet, true) }
+                    info.let {
+                        model.setInfoPallet(info!!)
+                    }
+                    viewState.showSnackbarViewMess("Ок")
+                }, {
+                    viewState.showSnackbarViewError(it.message.toString())
+                })
+        }
+
+    }
+
+    fun onClickLoad(index: Int) {
+        loadInfoPallet()
+    }
 }
 
 class Model(var guidDoc: String) {
 
     @Inject
     lateinit var interactorGetDoc: UseCaseGetMetaObj
-    var doc: InventoryPallet? = null
-    var behaviorSubjectViewModel = BehaviorSubject.create<ViewModel>()
 
+    @Inject
+    lateinit var interactorGetInfoPallet: UseCaseGetInfoPallet
+
+    var behaviorSubjectViewModel = BehaviorSubject.create<ViewModel>()
+    var doc: InventoryPallet? = null
     var viewModel: ViewModel? = null
 
     init {
@@ -124,16 +208,28 @@ class Model(var guidDoc: String) {
     fun refreshViewModel() {
         doc = interactorGetDoc.get(guidDoc) as InventoryPallet
 
+        var totalInfoPall = getTotalBoxInfoByPallet(doc!!)
+
         var list = doc!!.stringProduct.boxes.map {
             ItemList(
-                info = it.weight.toString()
+                info = it.weight.toString(),
+                left = "${formatDate(it.data)}",
+                guid = it.guid,
+                data = it.data
             )
-        }
+        }.sortedByDescending { it.data }
+
+
 
         viewModel = ViewModel(
             info = "${doc!!.description}",
+            right = "${totalInfoPall.weight} / ${totalInfoPall.countBox} / ${totalInfoPall.countPallet}",
+            left = "${doc!!.stringProduct!!.count} / ${doc!!.stringProduct!!.countBox}",
             list = list
         )
+
+
+
         behaviorSubjectViewModel.onNext(viewModel!!)
     }
 
@@ -144,28 +240,23 @@ class Model(var guidDoc: String) {
         box.data = Date()
         box.weight = weight
 
-        doc!!.addBox(box)
+        doc!!.stringProduct.addBox(box)
         doc!!.save()
         refreshViewModel()
     }
 
-    fun dellBarcode(index: Int) {
-        doc!!.dellBox(index)
-        doc!!.save()
-        refreshViewModel()
-    }
-
-    fun getBox(index: Int): Box {
-        return doc!!.getBox(index)
+    fun getBoxByIndex(index: Int): Box {
+        var guid = viewModel!!.list.get(index).guid
+        return doc!!.stringProduct.boxes.find { it.guid == guid }!!
     }
 
     fun saveBox(index: Int?, weight: Float, barcode: String?) {
         var box: Box?
         if (index != null) {
-            box = getBox(index)
+            box = getBoxByIndex(index)
         } else {
             box = Box()
-            doc!!.addBox(box)
+            doc!!.stringProduct.addBox(box)
         }
 
         box.barcode = barcode
@@ -190,6 +281,46 @@ class Model(var guidDoc: String) {
         doc!!.save()
         refreshViewModel()
 
+    }
+
+
+    fun savePallet(number: String, barcode: String) {
+        doc!!.barcodePallet = barcode
+        doc!!.numberPallet = number
+        doc!!.description = "Инвентаризация палеты ${doc!!.numberPallet} от ${formatDate(doc!!.date)}"
+        doc!!.save()
+        refreshViewModel()
+    }
+
+    fun dellBoxById(index: Int) {
+        var box = getBoxByIndex(index)
+        doc!!.stringProduct.dellBoxByGuid(box.guid!!)
+        doc!!.save()
+        refreshViewModel()
+    }
+
+    fun setInfoPallet(infoPallet: InfoPallet) {
+        doc!!.stringProduct.apply {
+            this.count = infoPallet.count
+            this.countBox = infoPallet.countBox
+            this.guidProduct = infoPallet.guid
+            this.nameProduct = infoPallet.nameProduct
+
+            this.weightBarcode = infoPallet.weightBarcode
+            this.weightCoffProduct = infoPallet.weightCoffProduct
+            this.weightStartProduct = infoPallet.weightStartProduct
+            this.weightEndProduct  = infoPallet.weightEndProduct
+        }
+
+        doc!!.description = "Инвентаризация палеты ${doc!!.numberPallet} от ${formatDate(doc!!.date)}" +
+                " ${infoPallet.sclad} ${infoPallet.state}"
+
+        doc!!.save()
+        refreshViewModel()
+    }
+
+    fun getInfoPalletFromServer(): Single<List<InfoPallet>> {
+        return interactorGetInfoPallet.load(listOf(doc!!.numberPallet!!))
     }
 }
 

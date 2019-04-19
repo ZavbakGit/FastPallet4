@@ -24,4 +24,7 @@ interface InventoryView : BaseView {
         , index: Int?
     )
 
+    @StateStrategyType(SkipStrategy::class)
+    fun showDialogConfirmDell(id:Int,title:String)
+
 }

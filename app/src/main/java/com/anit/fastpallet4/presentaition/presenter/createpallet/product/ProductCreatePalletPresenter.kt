@@ -77,20 +77,20 @@ class ProductCreatePalletPresenter(
                     .InputParamObj(
                         guid = inputParamObj!!.guid,
                         guidStringProduct = inputParamObj.guidStringProduct,
-                        guidPallet = model.getPalletGuidByIndex(index)
+                        guidPallet = model.getPalletByIndex(index)!!.guid!!
                     )
             )
         )
 
     }
 
-    fun onClickDell(id: Int) {
+    fun onClickDell(index: Int) {
         when (model.doc!!.status) {
             Status.NEW, Status.LOADED -> {
-                var guigPallet = model.getPalletGuidByIndex(id)
-                val pallet = model.getPallet(guigPallet)
-                var count = pallet.boxes.size
-                viewState.showDialogConfirmDell(id, "Удалить паллету? \n Коробок - $count")
+
+                val pallet = model.getPalletByIndex(index)
+                var count = pallet!!.boxes.size
+                viewState.showDialogConfirmDell(index, "Удалить паллету? \n Коробок - $count")
             }
             else -> viewState.showSnackbarViewError("Нельзя Удалять!")
         }
@@ -160,7 +160,7 @@ class Model(
 
     fun refreshViewModel() {
         doc = interactorGetDoc.get(guidDoc) as CreatePallet
-        stringProduct = getStringProducts(guidStringProduct)
+        stringProduct = doc!!.getStringProductByGuid(guidStringProduct)
 
 
         var totalInfoStr = getTotalBoxInfoByPallet(stringProduct!!)
@@ -188,21 +188,18 @@ class Model(
         behaviorSubjectViewModel.onNext(viewModel!!)
     }
 
-    fun getStringProducts(guid: String): StringProduct {
-        return doc!!.stringProducts.find { it.guid.equals(guid) }!!
+
+
+    fun getPalletByIndex(index: Int): Pallet? {
+        var guid =  viewModel!!.list.get(index).guid!!
+        return stringProduct!!.getPalletByGuid(guid)
     }
 
-    fun getPalletGuidByIndex(index: Int): String {
-        return viewModel!!.list.get(index).guid!!
-    }
 
-    fun getPallet(guid: String): Pallet {
-        return stringProduct!!.pallets.find { it.guid == guid }!!
-    }
 
-    fun dellPallet(id: Int) {
-        var guid = getPalletGuidByIndex(id)
-        stringProduct!!.pallets.removeAll { it.guid == guid }
+    fun dellPallet(index: Int) {
+        var guid = getPalletByIndex(index)!!.guid
+        stringProduct!!.dellPalletByGuid(guid!!)
         doc!!.save()
         refreshViewModel()
     }

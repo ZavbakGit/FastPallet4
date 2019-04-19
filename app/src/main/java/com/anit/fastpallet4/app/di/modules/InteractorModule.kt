@@ -6,6 +6,7 @@ import com.anit.fastpallet4.domain.usecase.*
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetFlowableListMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObjByGuidServer
+import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorGetInfoPallet
 import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorGetListDocFromServer
 import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorSendCreatePalletToServer
 import dagger.Module
@@ -41,6 +42,12 @@ class InteractorModule{
     @Provides
     fun provideUseCaseSendCreatePalletToServer(): UseCaseSendCreatePalletToServer
             = InteractorSendCreatePalletToServer()
+
+
+    @Singleton
+    @Provides
+    fun provideUseCaseGetInfoPallet(): UseCaseGetInfoPallet
+            = InteractorGetInfoPallet()
 
 
 
