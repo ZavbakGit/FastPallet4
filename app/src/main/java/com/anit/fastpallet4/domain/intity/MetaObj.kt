@@ -15,6 +15,8 @@ abstract class MetaObj(){
     var guidServer: String? = null
     var type: Type? = null
 
+    var typeFromServer:String? = null
+
     var status: Status = NEW
     var number: String? = null
 

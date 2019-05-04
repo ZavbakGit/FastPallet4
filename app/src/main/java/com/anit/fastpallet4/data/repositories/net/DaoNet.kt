@@ -50,7 +50,7 @@ class DaoNet {
             }
             .flatMap {
                 var listDoc = list.map {
-                    DocConfirm(it.guidServer!!, it.type!!.nameServer)
+                    DocConfirm(it.guidServer!!, it.typeFromServer!!)
                 }
 
                 managerNet.reqest(

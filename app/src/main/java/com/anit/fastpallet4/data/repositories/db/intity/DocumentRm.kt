@@ -10,6 +10,7 @@ open class DocumentRm(
     var guid: String? = null,
     @Required
     var typeDoc:Int? = null,
+    var typeFromServer:String? = null,
     var guidServer: String? = null,
     var data: String? = null
 ): RealmObject()

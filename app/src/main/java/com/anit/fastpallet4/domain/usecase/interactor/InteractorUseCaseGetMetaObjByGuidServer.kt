@@ -9,6 +9,7 @@ import javax.inject.Inject
 
 class InteractorUseCaseGetMetaObjByGuidServer: UseCaseGetMetaObjByGuidServer {
 
+
     @Inject
     lateinit var dao: DaoDb
 
@@ -16,8 +17,8 @@ class InteractorUseCaseGetMetaObjByGuidServer: UseCaseGetMetaObjByGuidServer {
         App.appComponent.inject(this)
     }
 
-    override fun get(guidServer: String): MetaObj? {
-        return dao.getMetaObjByServerGuid(guidServer)
+    override fun get(guid: String, typeFromServer: String): MetaObj? {
+        return dao.getMetaObjByServerGuid(guid,typeFromServer)
     }
 
 }

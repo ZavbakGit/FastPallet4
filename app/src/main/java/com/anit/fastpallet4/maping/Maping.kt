@@ -6,13 +6,9 @@ import com.anit.fastpallet4.data.repositories.db.intity.ItemListRm
 import com.anit.fastpallet4.data.repositories.net.intity.DocResponse
 import com.anit.fastpallet4.domain.intity.MetaObj
 import com.anit.fastpallet4.domain.intity.Type
-import com.anit.fastpallet4.domain.intity.Type.CREATE_PALLET
-import com.anit.fastpallet4.domain.intity.Type.INVENTORY_PALLET
+import com.anit.fastpallet4.domain.intity.Type.*
 import com.anit.fastpallet4.domain.intity.listmetaobj.ItemListMetaObj
-import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
-import com.anit.fastpallet4.domain.intity.metaobj.InventoryPallet
-import com.anit.fastpallet4.domain.intity.metaobj.Status
-import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
+import com.anit.fastpallet4.domain.intity.metaobj.*
 import com.anit.fastpallet4.domain.utils.getDecimalStr
 import com.google.gson.Gson
 import javax.inject.Inject
@@ -34,6 +30,7 @@ class Maping {
             guid = doc.guid,
             guidServer = doc.guidServer,
             typeDoc = doc.type!!.id,
+            typeFromServer = doc.typeFromServer,
             data = data
         )
 
@@ -43,6 +40,7 @@ class Maping {
         return when (Type.getTypeById(doc.typeDoc!!)) {
             CREATE_PALLET -> mapCreatePallet(doc)
             INVENTORY_PALLET -> mapCreateInventory(doc)
+            ACTION_PALLET -> mapCreateActionPallet(doc)
             else -> null
         }
     }
@@ -52,6 +50,7 @@ class Maping {
             guid = item.getGuid(),
             guidServer = item.getGuidServer(),
             type = item.type.id,
+            typeFromServer = item.typeFromServer,
             date = item.date,
             status = item.status.id,
             barcode = item.barcode,
@@ -67,6 +66,7 @@ class Maping {
             guid = item.guid,
             guidServer = item.guidServer,
             type = Type.getTypeById(item.type!!)!!,
+            typeFromServer = item.typeFromServer,
 
             date = item.date,
             status = Status.getStatusById(item.status)!!,
@@ -84,6 +84,7 @@ class Maping {
             guid = doc.guid,
             guidServer = doc.guidServer,
             type = doc.type!!,
+            typeFromServer = doc.typeFromServer,
             date = doc.date,
             status = doc.status,
             barcode = doc.barcode,
@@ -105,6 +106,17 @@ class Maping {
         return gson.fromJson(doc.data, InventoryPallet::class.java)
     }
 
+    private fun mapCreateActionPallet(doc: DocumentRm): ActionPallet {
+        //return Json.parse(InventoryPallet.serializer(), doc.data ?: "")
+        return gson.fromJson(doc.data, ActionPallet::class.java)
+    }
+
+    fun isActionDoc(type:String):Boolean{
+        return type.equals("РеализацияТоваровУслуг",true)||
+                type.equals("СписаниеТоваров",true)||
+                type.equals("ПеремещениеТоваров",true)
+    }
+
     fun map(docResponse: DocResponse): MetaObj? {
         return when {
             docResponse.type.equals("ФормированиеПалет", true) -> {
@@ -118,11 +130,13 @@ class Maping {
                 }
 
                 var doc = CreatePallet()
+                doc.typeFromServer = docResponse.type
                 doc.guidServer = docResponse.guid
                 doc.status = Status.getStatusByString(docResponse.status)!!
                 doc.number = docResponse.number
                 doc.date = docResponse.date
                 doc.description = docResponse.description
+
 
                 var list = docResponse.listStringsProduct?.map {
                     var strProd = StringProduct()
@@ -132,9 +146,6 @@ class Maping {
                     strProd.nameProduct = it.nameProduct
                     strProd.codeProduct = it.codeProduct
                     strProd.ed = it.ed
-
-
-
 
 
                     strProd.weightStartProduct = getDecimalStr(it.weightStartProduct).toIntOrNull() ?: 0
@@ -160,7 +171,55 @@ class Maping {
                 return doc
 
             }
+            isActionDoc(docResponse.type!!) -> {
+                if (docResponse.listStringsProduct?.map {
+                        it.guidProduct
+                    }?.distinct()?.size != docResponse.listStringsProduct?.size) {
 
+                    throw Throwable("Дубли Номенклатуры! ${docResponse.description}")
+
+                }
+
+                var doc = ActionPallet()
+                doc.typeFromServer = docResponse.type
+                doc.guidServer = docResponse.guid
+                doc.status = Status.getStatusByString(docResponse.status)!!
+                doc.number = docResponse.number
+                doc.date = docResponse.date
+                doc.description = docResponse.description
+
+                var list = docResponse.listStringsProduct?.map {
+                    var strProd = StringProduct()
+
+
+                    strProd.guidProduct = it.guidProduct
+                    strProd.nameProduct = it.nameProduct
+                    strProd.codeProduct = it.codeProduct
+                    strProd.ed = it.ed
+
+
+                    strProd.weightStartProduct = getDecimalStr(it.weightStartProduct).toIntOrNull() ?: 0
+                    strProd.weightEndProduct = getDecimalStr(it.weightEndProduct).toIntOrNull() ?: 0
+                    strProd.weightCoffProduct = getDecimalStr(it.weightCoffProduct).toFloatOrNull() ?: 0f
+
+                    strProd.edCoff = getDecimalStr(it.edCoff).toFloatOrNull() ?: 0f
+                    strProd.count = getDecimalStr(it.count).toFloatOrNull() ?: 0f
+                    strProd.countBox = getDecimalStr(it.countBox).toIntOrNull() ?: 0
+
+                    strProd.isWasLoadedLastTime = true
+
+                    return@map strProd
+
+                }
+
+                list?.let {
+                    doc.stringProducts.addAll(it)
+                }
+
+
+
+                return doc
+            }
             else -> null
 
 

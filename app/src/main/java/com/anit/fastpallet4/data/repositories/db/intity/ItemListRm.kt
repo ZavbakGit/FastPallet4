@@ -12,6 +12,7 @@ open class ItemListRm(
     var guid: String? = null,
     @Required
     var type: Int? = null,
+    var typeFromServer:String? = null,
     var guidServer: String? = null,
 
 

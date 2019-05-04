@@ -206,7 +206,6 @@ class Model {
         doc.date = Date()
         doc.status = NEW
         doc.description = "Инвентаризация"
-
         doc.save()
     }
 

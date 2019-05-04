@@ -14,5 +14,6 @@ class SendCreatePalletDocModelResponse:Response {
 
 class ItemConfimResponse{
     var guid: String? = null
+    var type:String? = null
     var status: String? = null
 }

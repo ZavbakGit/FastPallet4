@@ -31,7 +31,7 @@ class InteractorGetListDocFromServer : UseCaseGetListDocFromServer {
 
 
     private fun joinDocServAndDB(servDoc: MetaObj): MetaObj {
-        var dbDoc = getMetaObjByGuidServer.get(servDoc.guidServer ?: "")
+        var dbDoc = getMetaObjByGuidServer.get(servDoc.guidServer ?: "", servDoc.typeFromServer!!)
 
         if (dbDoc == null) {
             return servDoc
@@ -105,9 +105,6 @@ class InteractorGetListDocFromServer : UseCaseGetListDocFromServer {
             .flatMap {
                 Flowable.fromIterable(it)
             }
-            .doOnError {
-                it
-            }
             .map {
                 joinDocServAndDB(it)
             }
@@ -119,6 +116,9 @@ class InteractorGetListDocFromServer : UseCaseGetListDocFromServer {
             }
             .flatMap {
                 Flowable.fromIterable(it)
+            }
+            .map {
+                it
             }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext {

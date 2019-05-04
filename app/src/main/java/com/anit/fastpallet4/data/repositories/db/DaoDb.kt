@@ -65,12 +65,12 @@ class DaoDb {
         } else {
             maping.map(doc)
         }
-
     }
 
-    fun getMetaObjByServerGuid(guidServer: String): MetaObj? {
+    fun getMetaObjByServerGuid(guidServer: String,typeFromServer:String): MetaObj? {
         var realm = realmInitLocal.getLocalInstance()
         var doc = realm.where(DocumentRm::class.java)
+            .equalTo("typeFromServer", typeFromServer)
             .equalTo("guidServer", guidServer)
             .findFirst()
 

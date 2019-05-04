@@ -8,6 +8,7 @@ class ItemListMetaObj(
     private var guid: String? = null,
     private var guidServer: String? = null,
     val type: Type,
+    var typeFromServer:String? = null,
     var status: Status,
     var number: String? = null,
     var date: Date? = null,

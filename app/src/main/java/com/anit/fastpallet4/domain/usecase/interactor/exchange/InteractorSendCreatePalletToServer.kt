@@ -35,7 +35,7 @@ class InteractorSendCreatePalletToServer : UseCaseSendCreatePalletToServer {
 
     fun saveStatus(list:List<ItemConfimResponse>){
         list.forEach {
-            var metaObj = getMetaObjByGuidServer.get(it.guid!!)
+            var metaObj = getMetaObjByGuidServer.get(it.guid!!,it.type!!)
             var stattus = Status.getStatusByString(it.status)
             metaObj!!.status = stattus!!
             metaObj.save()
