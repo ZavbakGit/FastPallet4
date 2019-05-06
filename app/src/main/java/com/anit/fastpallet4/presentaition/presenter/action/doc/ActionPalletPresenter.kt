@@ -1,29 +1,27 @@
-package com.anit.fastpallet4.presentaition.presenter.createpallet.doc
+package com.anit.fastpallet4.presentaition.presenter.action.doc
 
 
 import com.anit.fastpallet4.app.App
-import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
-import com.anit.fastpallet4.domain.intity.metaobj.Pallet
+import com.anit.fastpallet4.domain.intity.metaobj.ActionPallet
 import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
+import com.anit.fastpallet4.presentaition.ui.screens.action.doc.ActionPalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseView
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
-import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.doc.CreatePalletFrScreen
-import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.product.ProductCreatePalletFrScreen
+import com.anit.fastpallet4.presentaition.ui.screens.action.product.ProductActionPalletFrScreen
 
 import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
 import ru.terrakok.cicerone.Router
-import java.math.BigDecimal
-import java.util.*
+
 import javax.inject.Inject
 
 @InjectViewState
-class CreatePalletPresenter(
+class ActionPalletPresenter(
     router: Router,
-    private val inputParamObj: CreatePalletFrScreen.InputParamObj?
+    private val inputParamObj: ActionPalletFrScreen.InputParamObj?
 
 ) : BasePresenter<BaseView>(router) {
 
@@ -47,8 +45,8 @@ class CreatePalletPresenter(
 
     fun onClickItem(index: Int) {
         router.navigateTo(
-            screens.getProductCreatePalletFrScreen(
-                ProductCreatePalletFrScreen
+            screens.getProductActionPalletFrScreen(
+                ProductActionPalletFrScreen
                     .InputParamObj(
                         guid = inputParamObj!!.guid,
                         guidStringProduct = model.getStringProductByIndex(index).guid!!
@@ -64,7 +62,7 @@ class Model(var guid: String) {
 
     @Inject
     lateinit var interactorGetDoc: UseCaseGetMetaObj
-    var doc: CreatePallet? = null
+    var doc: ActionPallet? = null
     var behaviorSubjectViewModel = BehaviorSubject.create<ViewModel>()
     var viewModel: ViewModel? = null
 
@@ -79,23 +77,20 @@ class Model(var guid: String) {
     }
 
     fun refreshViewModel() {
-        doc = interactorGetDoc.get(guid) as CreatePallet
+        doc = interactorGetDoc.get(guid) as ActionPallet
         var list = doc!!.stringProducts.map {
 
-            var summPalletInfoStr = it.getSummPalletInfoFromPalletBoxes()
-
-
+            var summPalletInfo = it.getSummPalletInfoForAction()
 
             ItemList(
                 info = it.nameProduct,
                 left = "${it.count} / ${it.countBox} ",
-                right = "${summPalletInfoStr.count} / ${summPalletInfoStr.countBox} / ${summPalletInfoStr.countPallet} ",
+                right = "${summPalletInfo.count} / ${summPalletInfo.countBox} / ${summPalletInfo.countPallet} ",
                 guid = it.guid
             )
         }
 
 
-        //Это нумерация
         list.forEachIndexed { index, itemList ->
             itemList.info = "${list.size - index}. ${itemList.info}"
         }

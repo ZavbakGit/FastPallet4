@@ -16,7 +16,7 @@
 
                 <android.support.design.widget.TextInputLayout
                         android:layout_margin="8dp"
-                        android:id="@+id/til_barcode"
+                        android:id="@+id/till_barcode"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true">
@@ -35,7 +35,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
-                        android:layout_below="@+id/til_barcode"
+                        android:layout_below="@+id/till_barcode"
                         android:layout_margin="8dp"
 
                 >
@@ -53,8 +53,8 @@
                         android:id="@+id/till_end"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_below="@+id/till_start"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/till_barcode"
                         android:layout_margin="8dp"
                 >
 
@@ -72,7 +72,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
-                        android:layout_below="@+id/till_end"
+                        android:layout_below="@+id/till_start"
                         android:layout_margin="8dp"
                 >
 

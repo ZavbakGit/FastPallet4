@@ -17,7 +17,7 @@ import com.anit.fastpallet4.presentaition.ui.base.ItemList
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.product.ProductCreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.inventory.CreatePalletProductView
-import com.anit.fastpallet4.presentaition.ui.util.getTotalBoxInfoByPallet
+
 import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
@@ -163,21 +163,23 @@ class Model(
         stringProduct = doc!!.getStringProductByGuid(guidStringProduct)
 
 
-        var totalInfoStr = getTotalBoxInfoByPallet(stringProduct!!)
+        var summPalletInfoStr = stringProduct!!.getSummPalletInfoFromPalletBoxes()
+
+
 
         viewModel = ViewModel(
             info = "${stringProduct?.nameProduct}",
             left = "${stringProduct!!.count} / ${stringProduct!!.countBox}",
-            right = "${totalInfoStr.weight} / ${totalInfoStr.countBox} / ${totalInfoStr.countPallet}",
+            right = "${summPalletInfoStr.count} / ${summPalletInfoStr.countBox} / ${summPalletInfoStr.countPallet}",
             list = stringProduct!!.pallets
                 .map {
 
-                    var totalInfoPall = getTotalBoxInfoByPallet(it)
+                    var summPalletInfopall = it.getSummPalletInfoFromBoxes()
 
                     ItemList(
                         info = it.number,
                         left = "${formatDate(it.dataChanged)}",
-                        right = "${totalInfoPall.weight} / ${totalInfoPall.countBox} / ${totalInfoPall.countPallet} ",
+                        right = "${summPalletInfopall.count} / ${summPalletInfopall.countBox} / ${summPalletInfopall.countPallet} ",
                         data = it.dataChanged,
                         guid = it.guid
                     )

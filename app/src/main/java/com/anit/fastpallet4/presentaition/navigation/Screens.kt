@@ -2,6 +2,8 @@ package com.anit.fastpallet4.presentaition.navigation
 
 import android.content.Context
 import com.anit.fastpallet4.app.App
+import com.anit.fastpallet4.presentaition.ui.screens.action.doc.ActionPalletFrScreen
+import com.anit.fastpallet4.presentaition.ui.screens.action.product.ProductActionPalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.inventory.InventoryFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.doc.CreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCreatePalletFrScreen
@@ -41,6 +43,9 @@ class Screens {
         }
     }
 
+
+
+    //region CreatePallet
     fun getCreatePalletFrScreen(inputparam: CreatePalletFrScreen.InputParamObj?): SupportAppScreen {
         return object : SupportAppScreen() {
             override fun getFragment() = CreatePalletFrScreen.newInstance(inputparam)
@@ -58,7 +63,22 @@ class Screens {
             override fun getFragment() = PalletCreatePalletFrScreen.newInstance(inputparam)
         }
     }
+    //endregion
 
+    //region ActionPallet
+    fun getActionPalletFrScreen(inputparam: ActionPalletFrScreen.InputParamObj?): SupportAppScreen {
+        return object : SupportAppScreen() {
+            override fun getFragment() = ActionPalletFrScreen.newInstance(inputparam)
+        }
+    }
+
+    fun getProductActionPalletFrScreen(inputparam: ProductActionPalletFrScreen.InputParamObj?): SupportAppScreen {
+        return object : SupportAppScreen() {
+            override fun getFragment() = ProductActionPalletFrScreen.newInstance(inputparam)
+        }
+    }
+
+    //endregion
 
 
 

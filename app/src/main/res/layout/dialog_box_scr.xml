@@ -16,7 +16,7 @@
 
                 <android.support.design.widget.TextInputLayout
                         android:layout_margin="8dp"
-                        android:id="@+id/til_barcode"
+                        android:id="@+id/till_barcode"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true">
@@ -35,19 +35,35 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
-                        android:layout_below="@+id/til_barcode"
-                        android:layout_margin="8dp"
-
-                >
+                        android:layout_below="@+id/till_barcode"
+                        android:layout_margin="8dp">
 
                     <android.support.design.widget.TextInputEditText
                             android:id="@+id/ed_weight"
-                            android:inputType="numberDecimal"
+                            android:inputType="number"
                             android:layout_width="match_parent"
                             android:ems="6"
                             android:layout_height="wrap_content"
                             android:hint="Вес"/>
                 </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                        android:id="@+id/till_count_box"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/till_barcode"
+                        android:layout_margin="8dp">
+
+                    <android.support.design.widget.TextInputEditText
+                            android:id="@+id/ed_count_box"
+                            android:inputType="numberDecimal"
+                            android:layout_width="match_parent"
+                            android:ems="6"
+                            android:layout_height="wrap_content"
+                            android:hint="Мест"/>
+                </android.support.design.widget.TextInputLayout>
+
 
                 <android.support.design.widget.TextInputLayout
                         android:id="@+id/till_date"

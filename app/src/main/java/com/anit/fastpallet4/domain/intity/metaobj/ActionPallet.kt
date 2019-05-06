@@ -38,7 +38,6 @@ class ActionPallet : MetaObj(type = Type.ACTION_PALLET) {
             }
 
         stringProducts
-            .flatMap { it.pallets }
             .flatMap { it.boxes }
             .forEach {
                 if (it.guid.isNullOrEmpty()) {

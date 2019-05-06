@@ -7,19 +7,11 @@ import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v7.app.AlertDialog
 import android.widget.EditText
-import android.widget.TextView
 import com.anit.fastpallet4.R
 import com.anit.fastpallet4.common.formatDate
-import com.anit.fastpallet4.domain.utils.getWeightByBarcode
-import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
-import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCreatePalletFrScreen
-import com.anit.fastpallet4.presentaition.ui.util.edTextChangesToFlowable
 
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 
-import io.reactivex.rxkotlin.combineLatest
-import kotlinx.android.synthetic.main.dialog_product_scr.*
 import java.io.Serializable
 import java.util.*
 
@@ -29,6 +21,7 @@ class BoxDialogFr : DialogFragment() {
         val title: String? = null,
         val index: Int? = null,
         var barcode: String? = null,
+        var countBox: Int = 1,
         var weight: Float = 0f,
         var date: Date = Date()
     ) : Serializable
@@ -50,6 +43,7 @@ class BoxDialogFr : DialogFragment() {
 
     var ed_barcode: EditText? = null
     var ed_weight: EditText? = null
+    var ed_count_box: EditText? = null
     var ed_date: EditText? = null
 
 
@@ -61,26 +55,26 @@ class BoxDialogFr : DialogFragment() {
 
         var param = inputParamObj as InputParamObj
 
-        val b = AlertDialog.Builder(activity!!)
+        val builder = AlertDialog.Builder(activity!!)
             .setTitle(param.title)
             .setPositiveButton(
                 "OK"
             ) { dialog, whichButton ->
 
                 var weight = ed_weight?.text.toString().toFloatOrNull() ?: 0f
+                var countBox = ed_count_box?.text.toString().toIntOrNull() ?: 1
 
 
                 var param = InputParamObj(
                     index = (inputParamObj as InputParamObj).index,
                     barcode = ed_barcode?.text.toString(),
-                    weight = weight
+                    weight = weight,
+                    countBox = countBox
                 )
 
                 val intent = Intent()
                 intent.putExtra(PARAM_KEY, param)
                 targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
-
-
 
 
                 dialog.dismiss()
@@ -101,18 +95,29 @@ class BoxDialogFr : DialogFragment() {
 
         ed_barcode = v.findViewById(R.id.ed_barcode) as EditText
         ed_weight = v.findViewById(R.id.ed_weight) as EditText
+        ed_count_box = v.findViewById(R.id.ed_count_box) as EditText
         ed_date = v.findViewById(R.id.ed_date) as EditText
+
+        ed_weight!!.setSelection(ed_weight!!.text.length)
 
 
 
 
         ed_barcode!!.setText(param.barcode)
         ed_weight!!.setText(if (param.weight == 0f) "" else param.weight.toString())
+        ed_count_box!!.setText(if (param.countBox == 0) "1" else param.countBox.toString())
         ed_date!!.setText(formatDate(param.date))
 
+        ed_weight!!.setOnFocusChangeListener { view, b ->
+            (view as EditText).setSelection(0,view.text.length)
+        }
 
-        b.setView(v)
-        return b.create()
+        ed_count_box!!.setOnFocusChangeListener { view, b ->
+            (view as EditText).setSelection(0,view.text.length)
+        }
+
+        builder.setView(v)
+        return builder.create()
 
 
     }

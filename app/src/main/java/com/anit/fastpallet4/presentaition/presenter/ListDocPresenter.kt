@@ -1,13 +1,8 @@
 package com.anit.fastpallet4.presentaition.presenter
 
-import android.os.Handler
 import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.domain.intity.Type
-import com.anit.fastpallet4.domain.intity.Type.CREATE_PALLET
-import com.anit.fastpallet4.domain.intity.Type.INVENTORY_PALLET
-import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
 import com.anit.fastpallet4.domain.intity.metaobj.Status.NEW
-import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorCreatorMetaObj
 import com.anit.fastpallet4.presentaition.presenter.Model.MAIN_MENU.*
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
@@ -19,18 +14,16 @@ import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocView
 import com.arellomobile.mvp.InjectViewState
 import com.gladkikh.preference.PreferenceHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import ru.terrakok.cicerone.Router
 import java.util.*
 import javax.inject.Inject
-import android.support.v4.os.HandlerCompat.postDelayed
+import com.anit.fastpallet4.domain.intity.Type.*
 import com.anit.fastpallet4.domain.intity.listmetaobj.ItemListMetaObj
 import com.anit.fastpallet4.domain.usecase.*
-import com.anit.fastpallet4.presentaition.presenter.createpallet.pallet.ViewModel
+import com.anit.fastpallet4.presentaition.ui.screens.action.doc.ActionPalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.util.EventKeyClick
 import com.anit.fastpallet4.presentaition.ui.util.KeyKode
 import io.reactivex.Completable
-import io.reactivex.subjects.BehaviorSubject
 
 
 @InjectViewState
@@ -92,7 +85,9 @@ class ListDocPresenter(
                 screens.getCreatePalletFrScreen(CreatePalletFrScreen.InputParamObj(guid = guid))
             )
 
-
+            ACTION_PALLET ->router.navigateTo(
+                screens.getActionPalletFrScreen(ActionPalletFrScreen.InputParamObj(guid = guid))
+            )
         }
 
 

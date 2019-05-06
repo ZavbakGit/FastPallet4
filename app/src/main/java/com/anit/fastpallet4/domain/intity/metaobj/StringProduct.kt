@@ -1,7 +1,9 @@
 package com.anit.fastpallet4.domain.intity.metaobj
 
+import com.anit.fastpallet4.domain.intity.extra.SummPalletInfo
 import kotlinx.serialization.ContextualSerialization
 import kotlinx.serialization.Serializable
+import java.math.BigDecimal
 import java.util.*
 
 
@@ -24,6 +26,7 @@ class StringProduct {
     var edCoff: Float = 1f
     var count: Float = 0f
     var countBox: Int = 0
+    var countPallet:Int = 0 //Это под вопросом
 
 
 
@@ -58,5 +61,57 @@ class StringProduct {
     fun getBoxByGuid(guid:String):Box?{
         return  boxes.find { it.guid.equals(guid,true)}
     }
+
+    //Это итог с сервера
+    fun getSummPalletInfoFromServer(): SummPalletInfo{
+        return SummPalletInfo(countBox = countBox,count = count,countPallet = countPallet)
+    }
+
+    fun getSummPalletInfoFromPalletBoxes(): SummPalletInfo {
+        return pallets.fold(SummPalletInfo()) { total: SummPalletInfo, pallet: Pallet ->
+            var sum = pallet.getSummPalletInfoFromBoxes()
+
+            var pal = sum.countPallet
+            var couBox = sum.countBox
+            var cou  = sum.countPallet
+
+            total.countPallet = total.countPallet + pal
+            total.countBox = total.countBox + couBox
+            total.count = BigDecimal(total.count.toString()).add(BigDecimal(cou.toString())).toFloat()
+            return@fold total
+        }
+    }
+
+    fun getSummPalletInfoForAction(): SummPalletInfo{
+        return boxes.fold(SummPalletInfo()) { total: SummPalletInfo, box: Box ->
+
+            var pal = pallets.size
+            var couBox = box.countBox
+            var cou  = box.weight
+
+            total.countPallet = pal
+            total.countBox = total.countBox + couBox
+            total.count = BigDecimal(total.count.toString()).add(BigDecimal(cou.toString())).toFloat()
+            return@fold total
+        }
+    }
+
+    fun getSummPalletInfoForInventory(): SummPalletInfo{
+        return boxes.fold(SummPalletInfo()) { total: SummPalletInfo, box: Box ->
+
+            var pal = 1
+            var couBox = box.countBox
+            var cou  = box.weight
+
+            total.countPallet = pal
+            total.countBox = total.countBox + couBox
+            total.count = BigDecimal(total.count.toString()).add(BigDecimal(cou.toString())).toFloat()
+
+            return@fold total
+
+        }
+    }
+
+
 
 }

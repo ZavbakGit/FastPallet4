@@ -14,7 +14,7 @@ import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCr
 import com.anit.fastpallet4.presentaition.ui.screens.inventory.CreatePalletView
 import com.anit.fastpallet4.presentaition.ui.util.EventKeyClick
 import com.anit.fastpallet4.presentaition.ui.util.KeyKode
-import com.anit.fastpallet4.presentaition.ui.util.getTotalBoxInfoByPallet
+
 import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
@@ -181,11 +181,9 @@ class Model(
         pallet = getPallet(guidPallet)
 
 
-        var totalInfoPall = getTotalBoxInfoByPallet(pallet!!)
-
         var list = pallet!!.boxes.map {
             ItemList(
-                info = "${it.weight.toString()} / 1",
+                info = "${it.weight} / 1",
                 left = "${formatDate(it.data)}",
                 guid = it.guid,
                 data = it.data
@@ -193,11 +191,13 @@ class Model(
         }
             .sortedByDescending { it.data }
 
+        var summPalletInfoPall = pallet!!.getSummPalletInfoFromBoxes()
+
         viewModel = ViewModel(
             info = "${pallet?.number}",
             list = list,
             left = "${formatDate(pallet!!.dataChanged)}",
-            right = "${totalInfoPall.weight} / ${totalInfoPall.countBox} / ${totalInfoPall.countPallet} "
+            right = "${summPalletInfoPall.count} / ${summPalletInfoPall.countBox} / ${summPalletInfoPall.countPallet} "
         )
 
 

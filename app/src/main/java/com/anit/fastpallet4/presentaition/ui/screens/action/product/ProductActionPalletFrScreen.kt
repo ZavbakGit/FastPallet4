@@ -1,24 +1,22 @@
-package com.anit.fastpallet4.presentaition.ui.screens.inventory
+package com.anit.fastpallet4.presentaition.ui.screens.action.product
 
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import com.anit.fastpallet4.R
-
 import com.anit.fastpallet4.presentaition.navigation.RouterProvider
-import com.anit.fastpallet4.presentaition.presenter.inventory.InventoryPresenter
+import com.anit.fastpallet4.presentaition.presenter.action.product.ProductActionPalletPresenter
+import com.anit.fastpallet4.presentaition.presenter.createpallet.product.ProductCreatePalletPresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseFragment
+import com.anit.fastpallet4.presentaition.ui.base.BaseView
 import com.anit.fastpallet4.presentaition.ui.base.MyListFragment
 import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
 import com.anit.fastpallet4.presentaition.ui.screens.dialogbox.BoxDialogFr
 import com.anit.fastpallet4.presentaition.ui.screens.dialogproduct.ProductDialogFr
-import com.anit.fastpallet4.presentaition.ui.util.EventKeyClick
+import com.anit.fastpallet4.presentaition.ui.screens.inventory.ActionPalletProductView
+import com.anit.fastpallet4.presentaition.ui.screens.inventory.CreatePalletProductView
 import com.anit.fastpallet4.presentaition.ui.util.KeyKode
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
@@ -26,30 +24,25 @@ import kotlinx.android.synthetic.main.doc_scr.*
 import java.io.Serializable
 import java.util.*
 
+class ProductActionPalletFrScreen : BaseFragment(), ActionPalletProductView {
 
-class InventoryFrScreen : BaseFragment(), InventoryView {
-
-
-    class InputParamObj(val guid: String) : Serializable
+    class InputParamObj(val guid: String,val guidStringProduct:String) : Serializable
 
     var inputParamObj: Serializable? = null
 
-
-
     companion object {
-
         val PARAM_KEY = "param"
-        fun newInstance(inputParam: InputParamObj? = null): InventoryFrScreen {
+        fun newInstance(inputParam: InputParamObj? = null): ProductActionPalletFrScreen {
             val bundle: Bundle = Bundle()
             bundle.putSerializable(PARAM_KEY, inputParam)
-            var fragment = InventoryFrScreen()
+            var fragment = ProductActionPalletFrScreen()
             fragment.arguments = bundle
             return fragment
         }
     }
 
     @InjectPresenter
-    lateinit var presenter: InventoryPresenter
+    lateinit var presenter: ProductActionPalletPresenter
 
     var REQEST_CODE_PRODUCT_DIALOG = 1
     var REQEST_CODE_BOX_DIALOG = 2
@@ -58,14 +51,14 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
     var dialogBox: BoxDialogFr? = null
 
     @ProvidePresenter
-    fun providePresenter() = InventoryPresenter(
+    fun providePresenter() = ProductActionPalletPresenter(
         router = (activity as RouterProvider).getRouter(),
         inputParamObj = arguments?.getSerializable(PARAM_KEY) as? InputParamObj
     )
 
-
     override fun getLayout() = R.layout.doc_scr
     override fun onBackPressed() = presenter.onBackPressed()
+
     override fun onStart() {
         super.onStart()
 
@@ -78,8 +71,9 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
             presenter.getViewModelFlowable()
                 .subscribe {
                     tv_info.text = it.info
-                    tv_info_doc_right.text = it.right
                     tv_info_doc_left.text = it.left
+                    tv_info_doc_right.text = it.right
+
                 }
         )
 
@@ -90,21 +84,17 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
 
         bagDisposable.add(
             listFrag.publishSubjectItemClick
-                .subscribe {
+                .subscribe{
                     presenter.onClickItem(it)
                 }
         )
 
-
-        //Штрихкод
         bagDisposable.add((activity as MainActivity).getFlowableBarcode()
             .subscribe {
-                if (!presenter.isShowDialog) {
-                    presenter.readBarcode(it)
+                if (!it.isNullOrEmpty()){
+                    presenter.readBarcode(it!!)
                 }
             })
-
-
 
         bagDisposable.add(
             listFrag.publishSubjectKeyClick
@@ -113,46 +103,45 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
                         presenter.onClickDell(it.id)
                     }
                     if (it.keyCode == KeyKode.KEY_LOAD) {
-                        presenter.loadInfoPallet()
+                        presenter.loadInfoPallets()
                     }
                 }
         )
-
-        header_doc.setOnKeyListener { view, keyKode, keyEvent ->
-            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-                if (keyKode == KeyKode.KEY_LOAD) {
-                    presenter.loadInfoPallet()
-                    return@setOnKeyListener true
-                }
-            }
-            return@setOnKeyListener false
-        }
-
-        //Это для срабатывания если пустая
-        header_doc.requestFocus()
-
 
         header_doc.setOnClickListener {
             presenter.onClickInfo()
         }
 
-
         presenter.onStart()
-
-
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = super.onCreateView(inflater, container, savedInstanceState)
-        var root = view!!.findViewById<View>(R.id.lay_root)
-        //root.setFocusableInTouchMode(true)
-        //root.requestFocus()
+    override fun showDialogProduct(
+        title: String
+        , barcode: String?
+        , weightStartProduct: Int
+        , weightEndProduct: Int
+        , weightCoffProduct: Float
+
+    ) {
 
 
+        if (!presenter.isShowDialog) {
+            dialogProduct = ProductDialogFr.newInstance(
+                ProductDialogFr.InputParamObj(
+                    title = title,
+                    barcode = barcode,
+                    weightStartProduct = weightStartProduct,
+                    weightEndProduct = weightEndProduct,
+                    weightCoffProduct = weightCoffProduct
+                )
+            )
+            val transaction = fragmentManager!!.beginTransaction()
+            dialogProduct!!.setTargetFragment(this, REQEST_CODE_PRODUCT_DIALOG)
+            dialogProduct!!.show(transaction, ProductDialogFr.TAG)
 
-        return view
+            presenter.isShowDialog = true
+        }
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -185,7 +174,8 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
                     presenter.saveBox(
                         barcode = param?.barcode,
                         weight = param?.weight ?: 0f,
-                        index = param?.index
+                        index = param?.index,
+                        countBox = param?.countBox?:1
                     )
                 }
             }
@@ -195,35 +185,7 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
         presenter.isShowDialog = false
     }
 
-    override fun showDialogProduct(
-        title: String
-        , barcode: String?
-        , weightStartProduct: Int
-        , weightEndProduct: Int
-        , weightCoffProduct: Float
-
-    ) {
-
-
-        if (!presenter.isShowDialog) {
-            dialogProduct = ProductDialogFr.newInstance(
-                ProductDialogFr.InputParamObj(
-                    title = title,
-                    barcode = barcode,
-                    weightStartProduct = weightStartProduct,
-                    weightEndProduct = weightEndProduct,
-                    weightCoffProduct = weightCoffProduct
-                )
-            )
-            val transaction = fragmentManager!!.beginTransaction()
-            dialogProduct!!.setTargetFragment(this, REQEST_CODE_PRODUCT_DIALOG)
-            dialogProduct!!.show(transaction, ProductDialogFr.TAG)
-
-            presenter.isShowDialog = true
-        }
-    }
-
-    override fun showDialogBox(title: String, barcode: String?, weight: Float, date: Date, index: Int?) {
+    override fun showDialogBox(title: String, barcode: String?, weight: Float, date: Date, index: Int?,countBox:Int) {
         if (!presenter.isShowDialog) {
             dialogBox = BoxDialogFr.newInstance(
                 BoxDialogFr.InputParamObj(
@@ -231,7 +193,8 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
                     barcode = barcode,
                     weight = weight,
                     date = date,
-                    index = index
+                    index = index,
+                    countBox = countBox
                 )
             )
             val transaction = fragmentManager!!.beginTransaction()
@@ -248,11 +211,10 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
             .setMessage("Удалить")
             .setNegativeButton(android.R.string.cancel, null) // dismisses by default
             .setPositiveButton("Да") { dialog, which ->
-                presenter.dellBox(id)
+                presenter.dellPallet(id)
             }
             .setOnCancelListener({ dialog -> "presenter.onErrorCancel()" })
             .show()
     }
-
 
 }

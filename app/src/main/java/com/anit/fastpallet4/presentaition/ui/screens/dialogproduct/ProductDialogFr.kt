@@ -3,9 +3,13 @@ package com.anit.fastpallet4.presentaition.ui.screens.dialogproduct
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v7.app.AlertDialog
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.widget.EditText
 import android.widget.TextView
 import com.anit.fastpallet4.R
@@ -13,14 +17,11 @@ import com.anit.fastpallet4.domain.utils.getWeightByBarcode
 import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.util.edTextChangesToFlowable
-import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.BiFunction
-import io.reactivex.rxkotlin.Flowables
 import io.reactivex.rxkotlin.combineLatest
-import kotlinx.android.synthetic.main.dialog_product_scr.*
 import java.io.Serializable
+import java.util.concurrent.TimeUnit
 
 
 class ProductDialogFr : DialogFragment() {
@@ -62,7 +63,7 @@ class ProductDialogFr : DialogFragment() {
 
         var param = inputParamObj as InputParamObj
 
-        val b = AlertDialog.Builder(activity!!)
+        val builder = AlertDialog.Builder(activity!!)
             .setTitle(param.title)
             .setPositiveButton(
                 "OK"
@@ -115,8 +116,21 @@ class ProductDialogFr : DialogFragment() {
         ed_barcode!!.setSelection(ed_barcode!!.getText().length)
 
 
-        b.setView(v)
-        return b.create()
+        ed_start!!.setOnFocusChangeListener { view, b ->
+            (view as EditText).setSelection(0, view.text.length)
+        }
+
+        ed_end!!.setOnFocusChangeListener { view, b ->
+            (view as EditText).setSelection(0, view.text.length)
+        }
+
+        ed_coff!!.setOnFocusChangeListener { view, b ->
+            (view as EditText).setSelection(0, view.text.length)
+        }
+
+
+        builder.setView(v)
+        return builder.create()
 
 
     }
@@ -140,6 +154,7 @@ class ProductDialogFr : DialogFragment() {
                 .map {
                     it
                 }
+                //.delay(1000, TimeUnit.MILLISECONDS)
                 .combineLatest(flwStart)
                 .map {
                     it
@@ -174,6 +189,28 @@ class ProductDialogFr : DialogFragment() {
                 .subscribe {
                     var str = it.toString()
                     ed_weight!!.setText(str)
+
+                    var text: SpannableStringBuilder
+
+
+
+                    //Разукрасим штрихкод
+                    var strBar = ed_barcode!!.text.toString()
+                    try {
+                        text = SpannableStringBuilder(strBar)
+                        val style = ForegroundColorSpan(Color.rgb(255, 0, 0))
+                        text.setSpan(
+                            style,
+                            (ed_start?.text.toString().toIntOrNull() ?: 0) - 1,
+                            (ed_end?.text.toString().toIntOrNull() ?: 0),
+                            Spannable.SPAN_INCLUSIVE_INCLUSIVE
+                        )
+                        ed_barcode!!.text = text
+                    } catch (e: Exception) {
+                        ed_barcode!!.setText(strBar)
+                    }
+
+
                 }
         )
 

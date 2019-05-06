@@ -23,6 +23,8 @@ import com.anit.fastpallet4.presentaition.presenter.ListDocPresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseActivity
 import com.anit.fastpallet4.presentaition.presenter.MainPresenter
 import com.anit.fastpallet4.presentaition.presenter.Model
+import com.anit.fastpallet4.presentaition.presenter.action.doc.ActionPalletPresenter
+import com.anit.fastpallet4.presentaition.presenter.action.product.ProductActionPalletPresenter
 import com.anit.fastpallet4.presentaition.presenter.createpallet.doc.CreatePalletPresenter
 import com.anit.fastpallet4.presentaition.presenter.createpallet.pallet.PalletCreatePalletPresenter
 import com.anit.fastpallet4.presentaition.presenter.createpallet.product.ProductCreatePalletPresenter
@@ -71,6 +73,10 @@ interface AppComponent {
     fun inject(interactorUseCaseGetMetaObjByGuidServer: InteractorUseCaseGetMetaObjByGuidServer)
     fun inject(interactorSendCreatePalletToServer: InteractorSendCreatePalletToServer)
     fun inject(interactorGetInfoPallet: InteractorGetInfoPallet)
+    fun inject(actionPalletPresenter: ActionPalletPresenter)
+    fun inject(model: com.anit.fastpallet4.presentaition.presenter.action.doc.Model)
+    fun inject(productActionPalletPresenter: ProductActionPalletPresenter)
+    fun inject(model: com.anit.fastpallet4.presentaition.presenter.action.product.Model)
 
 }
 

@@ -6,11 +6,9 @@ import com.anit.fastpallet4.common.formatDate
 import com.anit.fastpallet4.domain.intity.extra.InfoPallet
 import com.anit.fastpallet4.domain.intity.metaobj.Box
 import com.anit.fastpallet4.domain.intity.metaobj.InventoryPallet
-import com.anit.fastpallet4.domain.intity.metaobj.Pallet
 import com.anit.fastpallet4.domain.intity.metaobj.Status
 import com.anit.fastpallet4.domain.usecase.UseCaseGetInfoPallet
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
-import com.anit.fastpallet4.domain.utils.getDecimalStr
 import com.anit.fastpallet4.domain.utils.getNumberDocByBarCode
 import com.anit.fastpallet4.domain.utils.getWeightByBarcode
 import com.anit.fastpallet4.domain.utils.isPallet
@@ -18,11 +16,8 @@ import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
 import com.anit.fastpallet4.presentaition.ui.screens.inventory.InventoryFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.inventory.InventoryView
-import com.anit.fastpallet4.presentaition.ui.util.getTotalBoxInfoByPallet
 import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
-import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import ru.terrakok.cicerone.Router
@@ -208,7 +203,8 @@ class Model(var guidDoc: String) {
     fun refreshViewModel() {
         doc = interactorGetDoc.get(guidDoc) as InventoryPallet
 
-        var totalInfoPall = getTotalBoxInfoByPallet(doc!!)
+        var sumPalletInfo = doc!!.stringProduct.getSummPalletInfoForInventory()
+        var sumPalletInfoServer = doc!!.stringProduct.getSummPalletInfoFromServer()
 
         var list = doc!!.stringProduct.boxes.map {
             ItemList(
@@ -223,8 +219,8 @@ class Model(var guidDoc: String) {
 
         viewModel = ViewModel(
             info = "${doc!!.description}",
-            right = "${totalInfoPall.weight} / ${totalInfoPall.countBox} / ${totalInfoPall.countPallet}",
-            left = "${doc!!.stringProduct!!.count} / ${doc!!.stringProduct!!.countBox}",
+            right = "${sumPalletInfo.count} / ${sumPalletInfo.countBox} / ${sumPalletInfo.countPallet}",
+            left = "${sumPalletInfoServer.count} / ${sumPalletInfoServer.countBox}",
             list = list
         )
 
@@ -239,6 +235,7 @@ class Model(var guidDoc: String) {
         box.barcode = barcode
         box.data = Date()
         box.weight = weight
+        box.countBox = 1
 
         doc!!.stringProduct.addBox(box)
         doc!!.save()
