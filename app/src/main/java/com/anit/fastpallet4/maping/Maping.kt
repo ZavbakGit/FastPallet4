@@ -114,7 +114,8 @@ class Maping {
     fun isActionDoc(type:String):Boolean{
         return type.equals("РеализацияТоваровУслуг",true)||
                 type.equals("СписаниеТоваров",true)||
-                type.equals("ПеремещениеТоваров",true)
+                type.equals("ПеремещениеТоваров",true)||
+                type.equals("ИнвентиризацияМестВДокументе",true)
     }
 
     fun map(docResponse: DocResponse): MetaObj? {

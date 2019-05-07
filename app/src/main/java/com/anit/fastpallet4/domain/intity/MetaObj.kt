@@ -9,17 +9,15 @@ import kotlinx.serialization.Transient
 import java.util.*
 
 
-
-abstract class MetaObj(){
+abstract class MetaObj() {
     var guid: String? = null
     var guidServer: String? = null
     var type: Type? = null
 
-    var typeFromServer:String? = null
+    var typeFromServer: String? = null
 
     var status: Status = NEW
     var number: String? = null
-
 
 
     var date: Date? = null
@@ -32,15 +30,21 @@ abstract class MetaObj(){
     var barcode: String? = null
 
 
-
     //private var useCaseMetaObj: UseCaseMetaObj? = null
 
-    constructor(type: Type):this(){
+    constructor(type: Type) : this() {
         this.type = type
     }
 
-    init {
-        //useCaseMetaObj = InteractorUseCaseMetaObj(this)
+
+    open fun onlyRead(): Boolean {
+        when (status) {
+            Status.NEW, Status.LOADED -> {
+                return false
+            }
+            else ->
+                return true
+        }
     }
 
     open fun save() {

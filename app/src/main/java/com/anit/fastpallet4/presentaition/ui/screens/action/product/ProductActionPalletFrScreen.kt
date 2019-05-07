@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.view.KeyEvent
 import com.anit.fastpallet4.R
 import com.anit.fastpallet4.presentaition.navigation.RouterProvider
 import com.anit.fastpallet4.presentaition.presenter.action.product.ProductActionPalletPresenter
@@ -20,6 +21,7 @@ import com.anit.fastpallet4.presentaition.ui.screens.inventory.CreatePalletProdu
 import com.anit.fastpallet4.presentaition.ui.util.KeyKode
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.doc_scr.*
 import java.io.Serializable
 import java.util.*
@@ -58,6 +60,9 @@ class ProductActionPalletFrScreen : BaseFragment(), ActionPalletProductView {
 
     override fun getLayout() = R.layout.doc_scr
     override fun onBackPressed() = presenter.onBackPressed()
+
+
+
 
     override fun onStart() {
         super.onStart()
@@ -105,8 +110,26 @@ class ProductActionPalletFrScreen : BaseFragment(), ActionPalletProductView {
                     if (it.keyCode == KeyKode.KEY_LOAD) {
                         presenter.loadInfoPallets()
                     }
+                    if (it.keyCode == KeyKode.KEY_ADD) {
+                        presenter.onClickAdd()
+                    }
                 }
         )
+
+
+        header_doc.setOnKeyListener { view, keyKode, keyEvent ->
+            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyKode == KeyKode.KEY_ADD) {
+                    presenter.onClickAdd()
+                    return@setOnKeyListener true
+                }
+            }
+            return@setOnKeyListener false
+        }
+
+        //Это для срабатывания если пустая
+        header_doc.requestFocus()
+        header_doc.isFocusableInTouchMode = true
 
         header_doc.setOnClickListener {
             presenter.onClickInfo()

@@ -25,9 +25,17 @@ class ExampleUnitTest {
 
     data class My(val date:Date)
 
+
+
     @Test
     fun addition_isCorrect() {
 
+
+        println("kjhk")
+
+        if (true){
+            return
+        }
 
 
         listOf(My(Date()),My(Date())).sortedBy { it.date }.map {  }

@@ -3,7 +3,6 @@ package com.anit.fastpallet4.presentaition.presenter.action.product
 
 import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.common.formatDate
-import com.anit.fastpallet4.domain.intity.extra.InfoPallet
 import com.anit.fastpallet4.domain.intity.metaobj.*
 import com.anit.fastpallet4.domain.usecase.UseCaseGetInfoPallet
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
@@ -19,7 +18,6 @@ import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import ru.terrakok.cicerone.Router
 import java.util.*
@@ -61,8 +59,12 @@ class ProductActionPalletPresenter(
         , weightStartProduct: Int
         , weightEndProduct: Int
         , weightCoffProduct: Float
-    )
-    {
+    ) {
+        if (model.doc!!.onlyRead()) {
+            viewState.showSnackbarViewError("Нельзя Изменять!")
+            return
+        }
+
         model.saveProduct(
             barcode = barcode,
             weightStartProduct = weightStartProduct,
@@ -72,7 +74,12 @@ class ProductActionPalletPresenter(
 
     }
 
-    fun saveBox(barcode: String?, weight: Float, index: Int?,countBox:Int) {
+    fun saveBox(barcode: String?, weight: Float, index: Int?, countBox: Int) {
+        if (model.doc!!.onlyRead()) {
+            viewState.showSnackbarViewError("Нельзя Изменять!")
+            return
+        }
+
         if (weight == 0f) {
             viewState.showSnackbarViewError("Не верный вес!")
         } else {
@@ -88,42 +95,41 @@ class ProductActionPalletPresenter(
     }
 
     fun readBarcode(barcode: String) {
-        when (model.doc!!.status) {
-            Status.NEW, Status.LOADED -> {
-                if (isPallet(barcode)) {
-                    //Если это паллета
+        if (model.doc!!.onlyRead()) {
+            viewState.showSnackbarViewError("Нельзя Изменять!")
+            return
+        }
 
-                    model.createPaletByBarcode(barcode)
-                        .subscribe({
-                            //viewState.showSnackbarViewMess("Ок")
-                        }, {
-                            viewState.showSnackbarViewError(it.message.toString())
-                        })
 
+        if (isPallet(barcode)) {
+            //Если это паллета
+
+            model.createPaletByBarcode(barcode)
+                .subscribe({
+                    //viewState.showSnackbarViewMess("Ок")
+                }, {
+                    viewState.showSnackbarViewError(it.message.toString())
+                })
+        } else {
+            //Если это не паллета
+            barcode.let {
+                var weight = getWeightByBarcode(
+                    barcode = it!!,
+                    start = model.stringProduct!!.weightStartProduct,
+                    finish = model.stringProduct!!.weightEndProduct,
+                    coff = model.stringProduct!!.weightCoffProduct
+                )
+
+                if (weight == 0f) {
+                    viewState.showSnackbarViewError("Не верный вес!")
+                } else if (it.length != model.stringProduct!!.barcode?.length) {
+                    viewState.showSnackbarViewError("Не верная длинна штрихкода!")
                 } else {
-
-                    //Если это не паллета
-                    barcode.let {
-                        var weight = getWeightByBarcode(
-                            barcode = it!!,
-                            start = model.stringProduct!!.weightStartProduct,
-                            finish = model.stringProduct!!.weightEndProduct,
-                            coff = model.stringProduct!!.weightCoffProduct
-                        )
-
-                        if (weight == 0f) {
-                            viewState.showSnackbarViewError("Не верный вес!")
-                        } else if (it.length != model.stringProduct!!.barcode?.length) {
-                            viewState.showSnackbarViewError("Не верная длинна штрихкода!")
-                        } else {
-                            model.addBox(weight, it)
-                        }
-                    }
-
+                    model.addBox(weight, it)
                 }
             }
-            else -> viewState.showSnackbarViewError("Нельзя Изменять!")
         }
+
     }
 
     fun onClickInfo() {
@@ -153,25 +159,51 @@ class ProductActionPalletPresenter(
     }
 
     fun onClickDell(index: Int) {
-        when (model.doc!!.status) {
-            Status.NEW, Status.LOADED -> {
-                viewState.showDialogConfirmDell(index, "Удалить?!")
-            }
-            else -> viewState.showSnackbarViewError("Нельзя Удалять!")
+        if (model.doc!!.onlyRead()) {
+            viewState.showSnackbarViewError("Нельзя Изменять!")
+            return
         }
+
+        viewState.showDialogConfirmDell(index, "Удалить?!")
     }
 
+
     fun dellPallet(id: Int) {
+        if (model.doc!!.onlyRead()) {
+            viewState.showSnackbarViewError("Нельзя Изменять!")
+            return
+        }
         model.dell(id)
     }
 
     fun loadInfoPallets() {
+
+        if (model.doc!!.onlyRead()) {
+            viewState.showSnackbarViewError("Нельзя Изменять!")
+            return
+        }
+
         model.getInfoPalletFromServer()
             .subscribe({
                 viewState.showSnackbarViewMess("Ок")
             },
                 { viewState.showSnackbarViewError(it.message.toString()) }
             )
+    }
+
+    fun onClickAdd() {
+        if (model.doc!!.onlyRead()) {
+            viewState.showSnackbarViewError("Нельзя Изменять!")
+            return
+        }
+        viewState.showDialogBox(
+            title = model.stringProduct!!.nameProduct ?: "",
+            weight = 0f,
+            date = Date(),
+            barcode = null,
+            index = null,
+            countBox = 1
+        )
     }
 }
 
@@ -303,7 +335,7 @@ class Model(
         refreshViewModel()
     }
 
-    fun saveBox(index: Int?, weight: Float, barcode: String?,countBox:Int) {
+    fun saveBox(index: Int?, weight: Float, barcode: String?, countBox: Int) {
         var box: Box?
         if (index != null) {
             box = getBoxByIndex(index)

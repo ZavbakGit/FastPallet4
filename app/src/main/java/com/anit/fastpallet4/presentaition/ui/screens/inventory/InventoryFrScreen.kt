@@ -132,6 +132,7 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
         header_doc.requestFocus()
 
 
+
         header_doc.setOnClickListener {
             presenter.onClickInfo()
         }
