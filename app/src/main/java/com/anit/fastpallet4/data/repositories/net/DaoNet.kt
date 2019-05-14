@@ -34,7 +34,7 @@ class DaoNet {
     }
 
     fun confirmDocs(list: List<MetaObj>): Flowable<ConfirmResponse> {
-        var command = "command_confirm_doc_create_pallet"
+        var command = "command_confirm_doc"
 
 
         return Flowable.just(1)
@@ -64,7 +64,7 @@ class DaoNet {
     }
 
     fun getListDocs(): Flowable<List<MetaObj>> {
-        var command = "command_get_doc_create_pallet"
+        var command = "command_get_doc"
 
 
         return Flowable.just(1)
@@ -106,7 +106,7 @@ class DaoNet {
     }
 
     fun sendCreatePallet(list: List<MetaObj>): Flowable<Response> {
-        var command = "command_send_doc_create_pallet"
+        var command = "command_send_doc"
 
 
         return Flowable.just(1)
