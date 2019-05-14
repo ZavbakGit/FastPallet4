@@ -3,6 +3,7 @@ package com.anit.fastpallet4.presentaition.ui.screens.creatpallet.product
 
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.view.KeyEvent
 import com.anit.fastpallet4.R
 import com.anit.fastpallet4.presentaition.navigation.RouterProvider
 import com.anit.fastpallet4.presentaition.presenter.createpallet.product.ProductCreatePalletPresenter
@@ -89,8 +90,11 @@ class ProductCreatePalletFrScreen : BaseFragment(), CreatePalletProductView {
                     if (it.keyCode == KeyKode.KEY_DELL) {
                         presenter.onClickDell(it.id)
                     }
+
                 }
         )
+
+
 
         presenter.onStart()
     }

@@ -8,6 +8,7 @@ import com.anit.fastpallet4.presentaition.ui.screens.inventory.InventoryFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.doc.CreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.product.ProductCreatePalletFrScreen
+import com.anit.fastpallet4.presentaition.ui.screens.infopallet.InfoPalletsFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.listdoc.ListDocFrScreen
 import com.gladkikh.preference.PreferenceHelper
 import ru.terrakok.cicerone.android.support.SupportAppScreen
@@ -75,6 +76,17 @@ class Screens {
     fun getProductActionPalletFrScreen(inputparam: ProductActionPalletFrScreen.InputParamObj?): SupportAppScreen {
         return object : SupportAppScreen() {
             override fun getFragment() = ProductActionPalletFrScreen.newInstance(inputparam)
+        }
+    }
+
+
+
+    //endregion
+
+    //region ActionPallet
+    fun getInfoPalletFrScreen(inputparam: InfoPalletsFrScreen.InputParamObj?): SupportAppScreen {
+        return object : SupportAppScreen() {
+            override fun getFragment() = InfoPalletsFrScreen.newInstance(inputparam)
         }
     }
 

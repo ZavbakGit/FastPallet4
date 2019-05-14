@@ -39,17 +39,19 @@ class Pallet {
 
     //Это итог с списка коробок
     fun getSummPalletInfoFromBoxes(): SummPalletInfo {
-        return boxes.fold(SummPalletInfo()) { total: SummPalletInfo, box: Box ->
+        var summ =  boxes.fold(SummPalletInfo()) { total: SummPalletInfo, box: Box ->
 
-            var pal = 1
+
             var couBox = box.countBox
             var cou  = box.weight
 
-            total.countPallet = pal
             total.countBox = total.countBox + couBox
             total.count = BigDecimal(total.count.toString()).add(BigDecimal(cou.toString())).toFloat()
             return@fold total
         }
+
+        summ.countPallet = 1
+        return  summ
     }
 
     //Это итог с сервера

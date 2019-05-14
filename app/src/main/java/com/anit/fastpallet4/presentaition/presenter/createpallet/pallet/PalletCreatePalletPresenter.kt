@@ -7,6 +7,7 @@ import com.anit.fastpallet4.domain.intity.metaobj.*
 import com.anit.fastpallet4.domain.intity.metaobj.Status.*
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
 import com.anit.fastpallet4.domain.utils.getWeightByBarcode
+import com.anit.fastpallet4.domain.utils.isPallet
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseView
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
@@ -54,27 +55,33 @@ class PalletCreatePalletPresenter(
         .toFlowable(BackpressureStrategy.BUFFER)
 
     fun readBarcode(barcode: String?) {
-        when (model.doc!!.status) {
-            NEW, LOADED -> {
-                barcode.let {
-                    var weight = getWeightByBarcode(
-                        barcode = it!!,
-                        start = model.stringProduct!!.weightStartProduct,
-                        finish = model.stringProduct!!.weightEndProduct,
-                        coff = model.stringProduct!!.weightCoffProduct
-                    )
 
-                    if (weight == 0f) {
-                        viewState.showSnackbarViewError("Не верный вес!")
-                    } else if (it.length != model.stringProduct!!.barcode?.length) {
-                        viewState.showSnackbarViewError("Не верная длинна штрихкода!")
-                    } else {
-                        model.addBox(weight, it)
-                    }
-                }
+        if (model.doc!!.onlyRead()) {
+            viewState.showSnackbarViewError("Нельзя Изменять!")
+            return
+        }
 
+        if (isPallet(barcode ?: "")) {
+            viewState.showSnackbarViewError("Это паллета!")
+            return
+        }
+
+
+        barcode.let {
+            var weight = getWeightByBarcode(
+                barcode = it!!,
+                start = model.stringProduct!!.weightStartProduct,
+                finish = model.stringProduct!!.weightEndProduct,
+                coff = model.stringProduct!!.weightCoffProduct
+            )
+
+            if (weight == 0f) {
+                viewState.showSnackbarViewError("Не верный вес!")
+            } else if (it.length != model.stringProduct!!.barcode?.length) {
+                viewState.showSnackbarViewError("Не верная длинна штрихкода!")
+            } else {
+                model.addBox(weight, it)
             }
-            else -> viewState.showSnackbarViewError("Нельзя Изменять!")
         }
     }
 
@@ -85,7 +92,8 @@ class PalletCreatePalletPresenter(
             weight = box!!.weight,
             date = box.data ?: Date(),
             barcode = box.barcode,
-            index = index
+            index = index,
+            countBox = box.countBox
 
         )
     }
@@ -116,14 +124,15 @@ class PalletCreatePalletPresenter(
 
     }
 
-    fun saveBox(barcode: String?, weight: Float, index: Int?) {
+    fun saveBox(barcode: String?, weight: Float, index: Int?, countBox: Int) {
         if (weight == 0f) {
             viewState.showSnackbarViewError("Не верный вес!")
         } else {
             model.saveBox(
                 index = index,
                 barcode = barcode,
-                weight = weight
+                weight = weight,
+                countBox = countBox
             )
         }
 
@@ -136,6 +145,23 @@ class PalletCreatePalletPresenter(
             }
             else -> viewState.showSnackbarViewError("Нельзя Удалять!")
         }
+
+    }
+
+    fun onClickAdd() {
+        if (model.doc!!.onlyRead()) {
+            viewState.showSnackbarViewError("Нельзя Изменять!")
+            return
+        }
+
+        viewState.showDialogBox(
+            title = model.stringProduct!!.nameProduct ?: "",
+            weight = 0f,
+            date = Date(),
+            barcode = null,
+            index = null,
+            countBox = 1
+        )
 
     }
 
@@ -183,7 +209,7 @@ class Model(
 
         var list = pallet!!.boxes.map {
             ItemList(
-                info = "${it.weight} / 1",
+                info = "${it.weight} / ${it.countBox}",
                 left = "${formatDate(it.data)}",
                 guid = it.guid,
                 data = it.data
@@ -235,7 +261,8 @@ class Model(
     fun saveBox(
         index: Int?,
         weight: Float,
-        barcode: String?
+        barcode: String?,
+        countBox: Int
     ) {
         var box: Box?
 
@@ -249,6 +276,7 @@ class Model(
         box!!.barcode = barcode
         box.data = Date()
         box.weight = weight
+        box.countBox = countBox
 
         doc!!.save()
         refreshViewModel()
@@ -260,6 +288,7 @@ class Model(
         box.barcode = barcode
         box.data = Date()
         box.weight = weight
+        box.countBox = 1
 
         pallet!!.boxes.add(box)
         doc!!.save()

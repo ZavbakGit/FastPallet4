@@ -22,6 +22,7 @@ interface InventoryView : BaseView {
         , weight: Float
         , date: Date
         , index: Int?
+        , countBox: Int
     )
 
     @StateStrategyType(SkipStrategy::class)

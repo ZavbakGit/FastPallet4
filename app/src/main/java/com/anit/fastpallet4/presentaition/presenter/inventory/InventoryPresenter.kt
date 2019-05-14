@@ -48,48 +48,47 @@ class InventoryPresenter(
         .toFlowable(BackpressureStrategy.BUFFER)
 
     fun readBarcode(barcode: String?) {
-        when (model.doc!!.status) {
-            Status.NEW, Status.LOADED -> {
-                barcode.let {
-                    // Если паллета
-                    if (isPallet(barcode!!)) {
-                        if (!model.doc!!.numberPallet.isNullOrEmpty()) {
-                            viewState.showSnackbarViewError("Палета уже назначена!\n ${model.doc!!.numberPallet}")
-                        } else {
-                            try {
-                                var number = getNumberDocByBarCode(barcode)
-                                model.savePallet(number, barcode)
-                            } catch (e: Throwable) {
-                                viewState.showSnackbarViewError("Ошибка в номере паллеты!")
-                            }
-                        }
-                    } else {
-                        //Если коробка
-                        if (model.doc!!.numberPallet.isNullOrEmpty()) {
-                            viewState.showSnackbarViewError("Сканируйте паллету!")
-                        } else {
-                            var weight = getWeightByBarcode(
-                                barcode = it!!,
-                                start = model.doc!!.stringProduct!!.weightStartProduct,
-                                finish = model.doc!!.stringProduct!!.weightEndProduct,
-                                coff = model.doc!!.stringProduct!!.weightCoffProduct
-                            )
 
-                            if (weight == 0f) {
-                                viewState.showSnackbarViewError("Не верный вес!")
-                            } else if (it.length != model.doc!!.stringProduct!!.barcode?.length) {
-                                viewState.showSnackbarViewError("Не верная длинна штрихкода!")
-                            } else {
-                                model.addBox(weight, it)
-                            }
-                        }
-
-                    }
-                }
-
-            }
-            else -> viewState.showSnackbarViewError("Нельзя Изменять!")
+        if (model.doc!!.onlyRead()) {
+            viewState.showSnackbarViewError("Нельзя Изменять!")
+            return
         }
+
+        if (isPallet(barcode!!)) {
+            if (!model.doc!!.numberPallet.isNullOrEmpty()) {
+                viewState.showSnackbarViewError("Палета уже назначена!\n ${model.doc!!.numberPallet}")
+            } else {
+                try {
+                    var number = getNumberDocByBarCode(barcode)
+                    model.savePallet(number, barcode)
+                } catch (e: Throwable) {
+                    viewState.showSnackbarViewError("Ошибка в номере паллеты!")
+                }
+            }
+
+            return
+        }
+
+        if (model.doc!!.numberPallet.isNullOrEmpty()) {
+            viewState.showSnackbarViewError("Сканируйте паллету!")
+        } else {
+            var weight = getWeightByBarcode(
+                barcode = barcode,
+                start = model.doc!!.stringProduct!!.weightStartProduct,
+                finish = model.doc!!.stringProduct!!.weightEndProduct,
+                coff = model.doc!!.stringProduct!!.weightCoffProduct
+            )
+
+            if (weight == 0f) {
+                viewState.showSnackbarViewError("Не верный вес!")
+            } else if (barcode.length != model.doc!!.stringProduct!!.barcode?.length) {
+                viewState.showSnackbarViewError("Не верная длинна штрихкода!")
+            } else {
+                model.addBox(weight, barcode)
+            }
+        }
+
+
 
 
     }
@@ -101,7 +100,8 @@ class InventoryPresenter(
             weight = box.weight,
             date = box.data ?: Date(),
             barcode = box.barcode,
-            index = index
+            index = index,
+            countBox = box.countBox
         )
     }
 
@@ -131,14 +131,15 @@ class InventoryPresenter(
 
     }
 
-    fun saveBox(barcode: String?, weight: Float, index: Int?) {
+    fun saveBox(barcode: String?, weight: Float, index: Int?, countBox: Int) {
         if (weight == 0f) {
             viewState.showSnackbarViewError("Не верный вес!")
         } else {
             model.saveBox(
                 index = index,
                 barcode = barcode,
-                weight = weight
+                weight = weight,
+                countBox = countBox
             )
         }
 
@@ -151,6 +152,23 @@ class InventoryPresenter(
             }
             else -> viewState.showSnackbarViewError("Нельзя Удалять!")
         }
+
+    }
+
+    fun onClickAdd() {
+        if (model.doc!!.onlyRead()) {
+            viewState.showSnackbarViewError("Нельзя Изменять!")
+            return
+        }
+
+        viewState.showDialogBox(
+            title = model.doc!!.stringProduct.nameProduct ?: "",
+            weight = 0f,
+            date = Date(),
+            barcode = null,
+            index = null,
+            countBox = 1
+        )
 
     }
 
@@ -208,7 +226,7 @@ class Model(var guidDoc: String) {
 
         var list = doc!!.stringProduct.boxes.map {
             ItemList(
-                info = it.weight.toString(),
+                info = "${it.weight} / ${it.countBox}",
                 left = "${formatDate(it.data)}",
                 guid = it.guid,
                 data = it.data
@@ -247,7 +265,7 @@ class Model(var guidDoc: String) {
         return doc!!.stringProduct.boxes.find { it.guid == guid }!!
     }
 
-    fun saveBox(index: Int?, weight: Float, barcode: String?) {
+    fun saveBox(index: Int?, weight: Float, barcode: String?, countBox: Int) {
         var box: Box?
         if (index != null) {
             box = getBoxByIndex(index)
@@ -259,6 +277,7 @@ class Model(var guidDoc: String) {
         box.barcode = barcode
         box.data = Date()
         box.weight = weight
+        box.countBox = countBox
 
         doc!!.save()
         refreshViewModel()

@@ -2,6 +2,7 @@ package com.anit.fastpallet4.presentaition.ui.screens.dialogproduct
 
 import android.app.Activity
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -56,6 +57,12 @@ class ProductDialogFr : DialogFragment() {
 
 
     protected val bagDisposable = CompositeDisposable()
+
+    override fun onDismiss(dialog: DialogInterface?) {
+        super.onDismiss(dialog)
+        targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_CANCELED, null)
+
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         inputParamObj = arguments?.getSerializable(PalletCreatePalletFrScreen.PARAM_KEY)

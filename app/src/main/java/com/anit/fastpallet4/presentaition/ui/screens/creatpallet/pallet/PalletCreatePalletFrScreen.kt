@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.view.KeyEvent
 import android.widget.PopupMenu
 import com.anit.fastpallet4.R
 import com.anit.fastpallet4.presentaition.navigation.RouterProvider
@@ -100,6 +101,7 @@ class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
                 if (!presenter.isShowDialog) {
                     presenter.readBarcode(it)
                 }
+
             })
 
 
@@ -109,12 +111,35 @@ class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
                     if (it.keyCode == KeyKode.KEY_DELL) {
                         presenter.onClickDell(it.id)
                     }
+                    if (it.keyCode == KeyKode.KEY_ADD) {
+                        presenter.onClickAdd()
+                    }
                 }
         )
 
-        tv_info.setOnClickListener {
+        header_doc.setOnKeyListener { view, keyKode, keyEvent ->
+            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyKode == KeyKode.KEY_ADD) {
+                    presenter.onClickAdd()
+                    return@setOnKeyListener true
+                }
+            }
+            return@setOnKeyListener false
+        }
+
+        //Это для срабатывания если пустая
+        header_doc.requestFocus()
+        header_doc.isFocusableInTouchMode = true
+
+        header_doc.setOnClickListener {
             presenter.onClickInfo()
         }
+
+        header_doc.setOnClickListener {
+            presenter.onClickInfo()
+        }
+
+
 
         presenter.onStart()
 
@@ -151,7 +176,8 @@ class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
                     presenter.saveBox(
                         barcode = param?.barcode,
                         weight = param?.weight ?: 0f,
-                        index = param?.index
+                        index = param?.index,
+                        countBox = param?.countBox?:1
                     )
                 }
             }
@@ -187,13 +213,7 @@ class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
         }
     }
 
-    override fun showDialogBox(
-        title: String,
-        barcode: String?,
-        weight: Float,
-        date: Date,
-        index: Int?
-    ) {
+    override fun showDialogBox(title: String, barcode: String?, weight: Float, date: Date, index: Int?,countBox:Int) {
         if (!presenter.isShowDialog) {
             dialogBox = BoxDialogFr.newInstance(
                 BoxDialogFr.InputParamObj(
@@ -201,7 +221,8 @@ class PalletCreatePalletFrScreen : BaseFragment(), CreatePalletView {
                     barcode = barcode,
                     weight = weight,
                     date = date,
-                    index = index
+                    index = index,
+                    countBox = countBox
                 )
             )
             val transaction = fragmentManager!!.beginTransaction()

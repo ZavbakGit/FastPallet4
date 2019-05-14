@@ -115,13 +115,22 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
                     if (it.keyCode == KeyKode.KEY_LOAD) {
                         presenter.loadInfoPallet()
                     }
+                    if (it.keyCode == KeyKode.KEY_ADD) {
+                        presenter.onClickAdd()
+                    }
                 }
         )
+
 
         header_doc.setOnKeyListener { view, keyKode, keyEvent ->
             if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
                 if (keyKode == KeyKode.KEY_LOAD) {
                     presenter.loadInfoPallet()
+                    return@setOnKeyListener true
+                }
+
+                if (keyKode == KeyKode.KEY_ADD) {
+                    presenter.onClickAdd()
                     return@setOnKeyListener true
                 }
             }
@@ -130,6 +139,13 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
 
         //Это для срабатывания если пустая
         header_doc.requestFocus()
+        header_doc.isFocusableInTouchMode = true
+
+        header_doc.setOnClickListener {
+            presenter.onClickInfo()
+        }
+
+
 
 
 
@@ -186,7 +202,8 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
                     presenter.saveBox(
                         barcode = param?.barcode,
                         weight = param?.weight ?: 0f,
-                        index = param?.index
+                        index = param?.index,
+                        countBox = param?.countBox?:1
                     )
                 }
             }
@@ -224,7 +241,7 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
         }
     }
 
-    override fun showDialogBox(title: String, barcode: String?, weight: Float, date: Date, index: Int?) {
+    override fun showDialogBox(title: String, barcode: String?, weight: Float, date: Date, index: Int?,countBox:Int) {
         if (!presenter.isShowDialog) {
             dialogBox = BoxDialogFr.newInstance(
                 BoxDialogFr.InputParamObj(
@@ -232,7 +249,8 @@ class InventoryFrScreen : BaseFragment(), InventoryView {
                     barcode = barcode,
                     weight = weight,
                     date = date,
-                    index = index
+                    index = index,
+                    countBox = countBox
                 )
             )
             val transaction = fragmentManager!!.beginTransaction()

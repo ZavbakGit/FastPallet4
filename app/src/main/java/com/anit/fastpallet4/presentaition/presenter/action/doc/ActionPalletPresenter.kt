@@ -97,7 +97,7 @@ class Model(var guid: String) {
 
 
         viewModel = ViewModel(
-            info = "${doc?.description} ${doc?.guid ?: ""}",
+            info = "${doc?.description}",
             list = list
         )
 

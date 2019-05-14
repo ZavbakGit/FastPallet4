@@ -234,7 +234,7 @@ class Model(
 
         var listBox = stringProduct!!.boxes.map {
             ItemList(
-                info = it.weight.toString(),
+                info = "${it.weight} / ${it.countBox}",
                 left = "${formatDate(it.data)}",
                 right = "${it.weight} / ${it.countBox}",
                 guid = it.guid,

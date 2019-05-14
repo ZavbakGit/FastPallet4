@@ -21,6 +21,7 @@ import com.anit.fastpallet4.domain.intity.Type.*
 import com.anit.fastpallet4.domain.intity.listmetaobj.ItemListMetaObj
 import com.anit.fastpallet4.domain.usecase.*
 import com.anit.fastpallet4.presentaition.ui.screens.action.doc.ActionPalletFrScreen
+import com.anit.fastpallet4.presentaition.ui.screens.infopallet.InfoPalletsFrScreen
 import com.anit.fastpallet4.presentaition.ui.util.EventKeyClick
 import com.anit.fastpallet4.presentaition.ui.util.KeyKode
 import io.reactivex.Completable
@@ -67,6 +68,9 @@ class ListDocPresenter(
                 }, {
                     viewState.showSnackbarViewError(it.message ?: "")
                 })
+            INFOPALLET -> {
+                router.navigateTo(screens.getInfoPalletFrScreen(InfoPalletsFrScreen.InputParamObj()))
+            }
         }
         return true
     }
@@ -85,7 +89,7 @@ class ListDocPresenter(
                 screens.getCreatePalletFrScreen(CreatePalletFrScreen.InputParamObj(guid = guid))
             )
 
-            ACTION_PALLET ->router.navigateTo(
+            ACTION_PALLET -> router.navigateTo(
                 screens.getActionPalletFrScreen(ActionPalletFrScreen.InputParamObj(guid = guid))
             )
         }
@@ -172,7 +176,8 @@ class Model {
         LOAD("Загрузить", 1),
         UNLOAD("Выгрузить базу в файл", 2),
         INVENTORY("Инвентаризация паллеты", 3),
-        SETTINGS("Настройки", 4);
+        SETTINGS("Настройки", 4),
+        INFOPALLET("Информация о паллете", 5);
     }
 
     fun getMainMenuById(id: Int): MAIN_MENU? {
@@ -181,6 +186,7 @@ class Model {
             2 -> return UNLOAD
             3 -> return INVENTORY
             4 -> return SETTINGS
+            5 -> return INFOPALLET
             else -> null
         }
     }
@@ -190,7 +196,8 @@ class Model {
             Pair(LOAD.id, LOAD.title),
             Pair(INVENTORY.id, INVENTORY.title),
             Pair(UNLOAD.id, UNLOAD.title),
-            Pair(SETTINGS.id, SETTINGS.title)
+            Pair(SETTINGS.id, SETTINGS.title),
+            Pair(INFOPALLET.id, INFOPALLET.title)
         )
 
     }
@@ -212,12 +219,12 @@ class Model {
                 listDoc = it.toMutableList()
             }
             .map { it ->
-                it.map {
+                it.map { doc ->
                     ItemList(
-                        identifier = it!!.getGuid(),
-                        info = "${it.description}",
-                        left = "${it.status.fullName}",
-                        type = it.type.id
+                        identifier = doc!!.getGuid(),
+                        info = "${doc.description}",
+                        left = "${doc.status.fullName}",
+                        type = doc.type.id
 
                     )
                 }

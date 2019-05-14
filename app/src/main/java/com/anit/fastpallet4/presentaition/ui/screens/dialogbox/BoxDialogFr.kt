@@ -2,6 +2,7 @@ package com.anit.fastpallet4.presentaition.ui.screens.dialogbox
 
 import android.app.Activity
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
@@ -49,6 +50,12 @@ class BoxDialogFr : DialogFragment() {
 
     protected val bagDisposable = CompositeDisposable()
 
+    override fun onDismiss(dialog: DialogInterface?) {
+        super.onDismiss(dialog)
+        targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_CANCELED, null)
+
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         inputParamObj = arguments?.getSerializable(PARAM_KEY)
                 as? InputParamObj
@@ -57,6 +64,7 @@ class BoxDialogFr : DialogFragment() {
 
         val builder = AlertDialog.Builder(activity!!)
             .setTitle(param.title)
+            .setCancelable(false)
             .setPositiveButton(
                 "OK"
             ) { dialog, whichButton ->

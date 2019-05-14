@@ -96,6 +96,7 @@ class ProductCreatePalletPresenter(
         }
     }
 
+
     fun dellPallet(id: Int) {
         model.dellPallet(id)
     }

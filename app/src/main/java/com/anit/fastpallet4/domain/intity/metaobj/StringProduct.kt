@@ -26,8 +26,7 @@ class StringProduct {
     var edCoff: Float = 1f
     var count: Float = 0f
     var countBox: Int = 0
-    var countPallet:Int = 0 //Это под вопросом
-
+    var countPallet: Int = 0 //Это под вопросом
 
 
     var dataChanged: Date? = null
@@ -46,25 +45,25 @@ class StringProduct {
     }
 
     fun dellPalletByGuid(guid: String) {
-        pallets.removeAll { it.guid.equals(guid,true) }
+        pallets.removeAll { it.guid.equals(guid, true) }
     }
 
     fun dellBoxByGuid(guid: String) {
-        boxes.removeAll { it.guid.equals(guid,true) }
+        boxes.removeAll { it.guid.equals(guid, true) }
     }
 
-    fun getPalletByGuid(guid:String):Pallet?{
-        return  pallets.find { it.guid.equals(guid,true)}
+    fun getPalletByGuid(guid: String): Pallet? {
+        return pallets.find { it.guid.equals(guid, true) }
     }
 
 
-    fun getBoxByGuid(guid:String):Box?{
-        return  boxes.find { it.guid.equals(guid,true)}
+    fun getBoxByGuid(guid: String): Box? {
+        return boxes.find { it.guid.equals(guid, true) }
     }
 
     //Это итог с сервера
-    fun getSummPalletInfoFromServer(): SummPalletInfo{
-        return SummPalletInfo(countBox = countBox,count = count,countPallet = countPallet)
+    fun getSummPalletInfoFromServer(): SummPalletInfo {
+        return SummPalletInfo(countBox = countBox, count = count, countPallet = countPallet)
     }
 
     fun getSummPalletInfoFromPalletBoxes(): SummPalletInfo {
@@ -73,7 +72,7 @@ class StringProduct {
 
             var pal = sum.countPallet
             var couBox = sum.countBox
-            var cou  = sum.countPallet
+            var cou = sum.count
 
             total.countPallet = total.countPallet + pal
             total.countBox = total.countBox + couBox
@@ -82,26 +81,49 @@ class StringProduct {
         }
     }
 
-    fun getSummPalletInfoForAction(): SummPalletInfo{
-        return boxes.fold(SummPalletInfo()) { total: SummPalletInfo, box: Box ->
+    fun getSummPalletInfoForAction(): SummPalletInfo {
+        var summBox = boxes.fold(SummPalletInfo()) { total: SummPalletInfo, box: Box ->
 
-            var pal = pallets.size
+            var pal = 0
             var couBox = box.countBox
-            var cou  = box.weight
+            var cou = box.weight
 
             total.countPallet = pal
             total.countBox = total.countBox + couBox
             total.count = BigDecimal(total.count.toString()).add(BigDecimal(cou.toString())).toFloat()
             return@fold total
         }
+
+        var summPall = pallets.fold(SummPalletInfo()) { total: SummPalletInfo, pallet: Pallet ->
+
+            var pal = 1
+            var couBox = pallet.countBox
+            var cou = pallet.count
+
+
+            total.countPallet = total.countPallet + pal
+            total.countBox = total.countBox + couBox
+            total.count = BigDecimal(total.count.toString()).add(BigDecimal(cou.toString())).toFloat()
+            return@fold total
+        }
+
+
+
+
+        return SummPalletInfo(
+            countPallet = summBox.countPallet + summPall.countPallet
+            , countBox = summBox.countBox + summPall.countBox
+            , count = BigDecimal(summBox.count.toString()).add(BigDecimal(summPall.count.toString())).toFloat()
+        )
+
     }
 
-    fun getSummPalletInfoForInventory(): SummPalletInfo{
+    fun getSummPalletInfoForInventory(): SummPalletInfo {
         return boxes.fold(SummPalletInfo()) { total: SummPalletInfo, box: Box ->
 
             var pal = 1
             var couBox = box.countBox
-            var cou  = box.weight
+            var cou = box.weight
 
             total.countPallet = pal
             total.countBox = total.countBox + couBox
@@ -111,7 +133,6 @@ class StringProduct {
 
         }
     }
-
 
 
 }

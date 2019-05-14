@@ -16,8 +16,8 @@ class NetHelper(private val netSettings: NetSettings, private val gson: Gson) {
 
     fun getFlowableResponse(reqestModel: ReqestModel): Flowable<ResponseModel> {
 
-        //var baseUrl = netSettings.getHost() ?: "http://172.31.255.168/rmmt/hs/api/"
-        var baseUrl = netSettings.getHost() ?: "http://172.31.255.139:45250/RMMT/hs/api/"
+        var baseUrl = netSettings.getHost() ?: "http://172.31.255.168/rmmt/hs/api/"
+        //var baseUrl = netSettings.getHost() ?: "http://172.31.255.139:45250/RMMT/hs/api/"
         //var url = netSettings.getHost() ?: "http://172.31.255.150/RMMT/hs/api/"
         //var url = netSettings.getHost() ?: "http://5.8.207.81:45250/RMMT/hs/api/"
 
