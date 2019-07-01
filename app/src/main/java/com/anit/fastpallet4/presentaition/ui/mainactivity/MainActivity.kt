@@ -4,6 +4,7 @@ package com.anit.fastpallet4.presentaition.ui.mainactivity
 import android.os.Bundle
 import com.anit.fastpallet4.R
 import com.anit.fastpallet4.app.App
+import com.anit.fastpallet4.common.PlaySound
 import com.anit.fastpallet4.presentaition.navigation.RouterProvider
 import com.anit.fastpallet4.presentaition.presenter.MainPresenter
 import com.anit.fastpallet4.presentaition.ui.base.BaseActivity
@@ -17,9 +18,13 @@ import com.gladkikh.preference.PreferenceHelper
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
 import javax.inject.Inject
+import android.content.Context.VIBRATOR_SERVICE
+import android.os.Vibrator
+
+
+
 
 class MainActivity :BaseActivity(), BaseView, RouterProvider {
-
 
     @InjectPresenter
     lateinit var presenter: MainPresenter

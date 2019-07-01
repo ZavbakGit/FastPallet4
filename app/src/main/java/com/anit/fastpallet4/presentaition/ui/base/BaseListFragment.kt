@@ -7,6 +7,7 @@ import android.support.v4.app.ListFragment
 import android.view.KeyEvent
 import android.view.View
 import android.widget.ListView
+import com.anit.fastpallet4.R
 import com.anit.fastpallet4.presentaition.ui.util.EventKeyClick
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
@@ -38,7 +39,9 @@ open abstract class BaseListFragment<T> : ListFragment() {
         super.onActivityCreated(savedInstanceState)
 
         adapter = Adapter(activity!!)
-        setListAdapter(adapter);
+        setListAdapter(adapter)
+        listView.setSelector(R.drawable.selector)
+
 
         listView.setOnKeyListener { view, keyKode, keyEvent ->
 

@@ -1,6 +1,7 @@
 package com.anit.fastpallet4.app.di.aplication
 
 
+import android.content.Context
 import com.anit.fastpallet4.app.di.activity.ActivityComponent
 import com.anit.fastpallet4.app.di.activity.ActivityModule
 import com.anit.fastpallet4.app.di.modules.*
@@ -31,6 +32,9 @@ import com.anit.fastpallet4.presentaition.presenter.createpallet.product.Product
 import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
 import dagger.Component
 import javax.inject.Singleton
+import dagger.Provides
+
+
 
 
 @Component(
@@ -47,6 +51,8 @@ import javax.inject.Singleton
 )
 @Singleton
 interface AppComponent {
+
+    fun getAppContext(): Context
     fun createActivityComponent(activityModule: ActivityModule): ActivityComponent
     fun inject(dao: DaoDb)
     fun inject(interactorUseCaseGetFlowableListMetaObj: InteractorUseCaseGetFlowableListMetaObj)
