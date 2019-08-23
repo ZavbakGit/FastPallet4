@@ -18,7 +18,7 @@ class BarcodeHelper(private val context: AppCompatActivity,typE_TSD: TYPE_TSD?) 
 
     enum class TYPE_TSD(val id:Int,val fullName:String,val action:String,val keyBarcode:String){
         ATOL_SMART_DROID(1,"АТОЛ Smart.Droid",
-            "com.motorolasolutions.emdk.sample.dwdemosample.RECVR",
+            "DATA_SCAN",
             "com.hht.emdk.datawedge.data_string"),
 
         ATOL_SMART_LIGHT(2,"АТОЛ Smart.Lite",
