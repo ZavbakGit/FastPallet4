@@ -25,10 +25,7 @@ class InteractorModule{
 //            = InteractorUseCaseGetFlowableListMetaObj()
 
 
-    @Singleton
-    @Provides
-    fun provideUseCaseGetListMetaObj(dao: DocumentDao): UseCaseGetListMetaObj
-            = InteractorUseCaseGetFlowableListDocumentDb(dao)
+
 
 
     @Singleton
@@ -58,12 +55,6 @@ class InteractorModule{
     @Provides
     fun provideUseCaseGetInfoPallet(): UseCaseGetInfoPallet
             = InteractorGetInfoPallet()
-
-
-    @Singleton
-    @Provides
-    fun provideUseCaseAddTestData(dao: CreatePalletUpdateDao): UseCaseAddTestData
-            = InteractorAddTestDataDb(dao)
 
 
 

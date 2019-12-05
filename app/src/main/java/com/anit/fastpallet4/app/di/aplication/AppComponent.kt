@@ -27,6 +27,8 @@ import com.anit.fastpallet4.presentaition.presenter.Model
 import com.anit.fastpallet4.presentaition.presenter.action.doc.ActionPalletPresenter
 import com.anit.fastpallet4.presentaition.presenter.action.product.ProductActionPalletPresenter
 import com.anit.fastpallet4.presentaition.presenter.createpallet.doc.CreatePalletPresenter
+import com.anit.fastpallet4.presentaition.presenter.createpallet.doc.CreatePalletPresenterDb
+import com.anit.fastpallet4.presentaition.presenter.createpallet.doc.ModelDb
 import com.anit.fastpallet4.presentaition.presenter.createpallet.pallet.PalletCreatePalletPresenter
 import com.anit.fastpallet4.presentaition.presenter.createpallet.product.ProductCreatePalletPresenter
 import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
@@ -44,6 +46,7 @@ import javax.inject.Singleton
         MapingModule::class,
         RepositoryModule::class,
         InteractorModule::class,
+        InteractorModuleDb::class,
         ExtraModul::class
     )
 )
@@ -82,6 +85,8 @@ interface AppComponent {
     fun inject(productActionPalletPresenter: ProductActionPalletPresenter)
     fun inject(model: com.anit.fastpallet4.presentaition.presenter.action.product.Model)
     fun inject(model: com.anit.fastpallet4.presentaition.presenter.infopallet.Model)
+    fun inject(createPalletPresenterDb: CreatePalletPresenterDb)
+    fun inject(modelDb: ModelDb)
 
 }
 

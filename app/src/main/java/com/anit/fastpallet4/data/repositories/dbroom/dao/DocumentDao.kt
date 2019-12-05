@@ -7,7 +7,10 @@ import io.reactivex.Flowable
 
 @Dao
 interface DocumentDao{
-
     @Query("SELECT * FROM CreatePalletDb")
     fun getListDocument(): Flowable<List<CreatePalletDb>>
+
+    @Query("SELECT * FROM CreatePalletDb WHERE guid=:guidDoc ")
+    fun getDocument(guidDoc:String): Flowable<CreatePalletDb>
+
 }

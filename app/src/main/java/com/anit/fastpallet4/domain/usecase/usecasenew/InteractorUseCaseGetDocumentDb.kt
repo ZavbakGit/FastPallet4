@@ -1,21 +1,23 @@
 package com.anit.fastpallet4.domain.usecase.usecasenew
 
-import com.anit.fastpallet4.data.repositories.dbroom.dao.CreatePalletUpdateDao
+import com.anit.fastpallet4.data.repositories.dbroom.dao.DocumentDao
 import com.anit.fastpallet4.data.repositories.dbroom.intity.CreatePalletDb
 import com.anit.fastpallet4.domain.intity.MetaObj
 import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
 import com.anit.fastpallet4.domain.intity.metaobj.Status
-import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
+import io.reactivex.Flowable
 import java.util.*
 
-class InteractorUseCaseGetMetaObjDb(private val dao: CreatePalletUpdateDao):UseCaseGetMetaObj{
-    override fun get(guid: String): MetaObj? {
-        return dao.getDocByGuid(guid)
+class InteractorUseCaseGetDocumentDb(private val dao: DocumentDao):UseCaseGetDocument{
+
+    override fun get(guid: String): Flowable<MetaObj> {
+        return dao.getDocument(guid).
+                map {
+                    it.toObject()
+                }
     }
 }
-
-
-fun CreatePalletDb.toObject():MetaObj{
+fun CreatePalletDb.toObject():CreatePallet{
     val doc = CreatePallet()
     doc.guid = this.guid
     doc.guidServer = this.guidServer
@@ -26,7 +28,6 @@ fun CreatePalletDb.toObject():MetaObj{
     doc.isWasLoadedLastTime = this.isLastLoad
     doc.description = this.description
     doc.barcode = this.barcode
-
 
     return doc
 }
