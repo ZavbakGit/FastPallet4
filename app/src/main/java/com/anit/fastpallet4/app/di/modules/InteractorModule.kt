@@ -5,14 +5,13 @@ package com.anit.fastpallet4.app.di.modules
 import com.anit.fastpallet4.data.repositories.dbroom.dao.CreatePalletUpdateDao
 import com.anit.fastpallet4.data.repositories.dbroom.dao.DocumentDao
 import com.anit.fastpallet4.domain.usecase.*
-import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetFlowableListMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObjByGuidServer
 import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorGetInfoPallet
 import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorGetListDocFromServer
 import com.anit.fastpallet4.domain.usecase.interactor.exchange.InteractorSendCreatePalletToServer
-import com.anit.fastpallet4.domain.usecase.usecasenew.InteractorAddTestData
-import com.anit.fastpallet4.domain.usecase.usecasenew.InteractorUseCaseGetFlowableListDocument
+import com.anit.fastpallet4.domain.usecase.usecasenew.InteractorAddTestDataDb
+import com.anit.fastpallet4.domain.usecase.usecasenew.InteractorUseCaseGetFlowableListDocumentDb
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -29,7 +28,7 @@ class InteractorModule{
     @Singleton
     @Provides
     fun provideUseCaseGetListMetaObj(dao: DocumentDao): UseCaseGetListMetaObj
-            = InteractorUseCaseGetFlowableListDocument(dao)
+            = InteractorUseCaseGetFlowableListDocumentDb(dao)
 
 
     @Singleton
@@ -64,7 +63,7 @@ class InteractorModule{
     @Singleton
     @Provides
     fun provideUseCaseAddTestData(dao: CreatePalletUpdateDao): UseCaseAddTestData
-            = InteractorAddTestData(dao)
+            = InteractorAddTestDataDb(dao)
 
 
 

@@ -8,7 +8,7 @@ import com.anit.fastpallet4.domain.usecase.UseCaseGetListMetaObj
 import io.reactivex.Flowable
 import java.util.*
 
-class InteractorUseCaseGetFlowableListDocument(val dao: DocumentDao) : UseCaseGetListMetaObj {
+class InteractorUseCaseGetFlowableListDocumentDb(val dao: DocumentDao) : UseCaseGetListMetaObj {
 
     override fun get(): Flowable<List<ItemListMetaObj?>> {
         return dao.getListDocument()

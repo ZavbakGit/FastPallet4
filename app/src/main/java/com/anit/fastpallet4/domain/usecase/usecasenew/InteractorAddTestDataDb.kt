@@ -9,7 +9,7 @@ import com.anit.fastpallet4.domain.intity.metaobj.Status
 import com.anit.fastpallet4.domain.usecase.UseCaseAddTestData
 import java.util.*
 
-class InteractorAddTestData(private val dao: CreatePalletUpdateDao) : UseCaseAddTestData {
+class InteractorAddTestDataDb(private val dao: CreatePalletUpdateDao) : UseCaseAddTestData {
 
     override fun add() {
 
