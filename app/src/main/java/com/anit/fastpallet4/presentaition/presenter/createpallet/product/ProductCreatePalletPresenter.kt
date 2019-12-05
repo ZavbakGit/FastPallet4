@@ -191,14 +191,10 @@ class Model(
         behaviorSubjectViewModel.onNext(viewModel!!)
     }
 
-
-
     fun getPalletByIndex(index: Int): Pallet? {
         var guid =  viewModel!!.list.get(index).guid!!
         return stringProduct!!.getPalletByGuid(guid)
     }
-
-
 
     fun dellPallet(index: Int) {
         var guid = getPalletByIndex(index)!!.guid

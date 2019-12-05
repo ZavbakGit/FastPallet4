@@ -2,7 +2,7 @@ package com.anit.fastpallet4.app.di.modules
 
 
 import android.content.Context
-import com.anit.fastpallet4.data.repositories.db.DaoDb
+import com.anit.fastpallet4.data.repositories.dbrealm.DaoDb
 import com.anit.fastpallet4.data.repositories.net.DaoNet
 import com.anit.fastpallet4.data.repositories.net.ManagerNet
 import com.anit.fastpallet4.data.repositories.preferense.DaoPref

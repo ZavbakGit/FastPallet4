@@ -1,7 +1,7 @@
 package com.anit.fastpallet4.domain.usecase.interactor
 
 import com.anit.fastpallet4.app.App
-import com.anit.fastpallet4.data.repositories.db.DaoDb
+import com.anit.fastpallet4.data.repositories.dbrealm.DaoDb
 import com.anit.fastpallet4.domain.intity.MetaObj
 import com.anit.fastpallet4.domain.usecase.UseCaseMetaObj
 import javax.inject.Inject

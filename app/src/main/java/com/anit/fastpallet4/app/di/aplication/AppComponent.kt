@@ -5,7 +5,7 @@ import android.content.Context
 import com.anit.fastpallet4.app.di.activity.ActivityComponent
 import com.anit.fastpallet4.app.di.activity.ActivityModule
 import com.anit.fastpallet4.app.di.modules.*
-import com.anit.fastpallet4.data.repositories.db.DaoDb
+import com.anit.fastpallet4.data.repositories.dbrealm.DaoDb
 import com.anit.fastpallet4.data.repositories.net.DaoNet
 import com.anit.fastpallet4.data.repositories.net.ManagerNet
 import com.anit.fastpallet4.data.repositories.preferense.DaoPref
@@ -32,9 +32,6 @@ import com.anit.fastpallet4.presentaition.presenter.createpallet.product.Product
 import com.anit.fastpallet4.presentaition.ui.mainactivity.MainActivity
 import dagger.Component
 import javax.inject.Singleton
-import dagger.Provides
-
-
 
 
 @Component(
@@ -43,6 +40,7 @@ import dagger.Provides
         NavigationModule::class,
         LocalNavigationModule::class,
         RealmModule::class,
+        RoomModule::class,
         MapingModule::class,
         RepositoryModule::class,
         InteractorModule::class,

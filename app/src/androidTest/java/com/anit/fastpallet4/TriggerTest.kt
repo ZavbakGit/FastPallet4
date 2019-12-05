@@ -1,13 +1,8 @@
 package com.anit.fastpallet4
 
-
 import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
-import org.junit.Test
-import org.junit.runner.RunWith
-
-import org.junit.Assert.*
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 import com.anit.fastpallet4.data.repositories.dbroom.AppDatabase
@@ -16,8 +11,12 @@ import com.anit.fastpallet4.data.repositories.dbroom.intity.BoxCreatePalletDb
 import com.anit.fastpallet4.data.repositories.dbroom.intity.CreatePalletDb
 import com.anit.fastpallet4.data.repositories.dbroom.intity.PalletCreatePalletDb
 import com.anit.fastpallet4.data.repositories.dbroom.intity.ProductCreatePalletDb
+import junit.framework.Assert.*
 import org.junit.After
 import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -25,7 +24,7 @@ import org.junit.Before
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
+class TriggerTest {
 
     private var db: AppDatabase? = null
     private var createPalletUpdateDao: CreatePalletUpdateDao? = null
@@ -42,6 +41,43 @@ class ExampleInstrumentedTest {
         isLastLoad = false
     )
 
+    private val productTest = ProductCreatePalletDb(
+        guid = "0",
+        guidDoc = docTest.guid,
+        dateChanged = null,
+        barcode = null,
+        count = null,
+        countBox = null,
+        countBack = null,
+        countBoxBack = null,
+        countRow = null,
+        isLastLoad = null,
+        nameProduct = null,
+        number = null,
+        codeProduct = null,
+        ed = null,
+        edCoff = null,
+        weightBarcode = null,
+        weightStartProduct = null,
+        weightEndProduct = null,
+        weightCoffProduct = null,
+        countPallet = null,
+        guidProductBack = null
+    )
+
+    private val palletTest = PalletCreatePalletDb(
+        guid = "0",
+        guidProduct = productTest.guid,
+        number = null,
+        nameProduct = null,
+        countRow = null,
+        countBox = null,
+        count = null,
+        barcode = null,
+        dateChanged = null,
+        state = null,
+        sclad = null
+    )
 
     private fun getListProduct(guidDoc: String): List<ProductCreatePalletDb> {
         return (0..3).map {
@@ -250,11 +286,8 @@ class ExampleInstrumentedTest {
     }
 
     @Test
-    fun reCalcTest() {
+    fun insetBoxTest() {
         cretTestData()
-
-        createPalletUpdateDao!!.recalcPallet()
-        createPalletUpdateDao!!.reCalcProduct()
 
         testDoc(docTest, getListProduct(docTest.guid))
         getListProduct(docTest.guid).forEach { prod ->
@@ -269,11 +302,102 @@ class ExampleInstrumentedTest {
         assertNull("Нe удалился документ", createPalletUpdateDao!!.getDocByGuid(docTest.guid))
     }
 
+    @Test
+    fun updateDeleteBoxTest() {
+
+        val listBox = (0..3).map {
+            BoxCreatePalletDb(
+                guid = it.toString(),
+                dateChanged = null,
+                barcode = null,
+                count = 10f,
+                countBox = 2,
+                guidPallet = palletTest.guid
+
+            )
+        }
+
+        createPalletUpdateDao!!.insertOrUpdate(docTest)
+        createPalletUpdateDao!!.insertOrUpdate(productTest)
+        createPalletUpdateDao!!.insertOrUpdate(palletTest)
+
+        listBox.forEach {
+            createPalletUpdateDao!!.insertOrUpdate(it)
+        }
+
+
+        val box0 = listBox[0]
+        box0.count = box0.count?.plus(10f)
+        box0.countBox = box0.countBox?.plus(10)
+        createPalletUpdateDao!!.insertOrUpdate(box0)
+
+
+        //update
+        testPallet(palletTest, listBox)
+        testProduct(productTest, listOf(palletTest))
+
+        //delete
+        createPalletUpdateDao!!.deleteTrigger(box0)
+        testPallet(palletTest, listBox.filter { it.guid != box0.guid })
+        testProduct(productTest, listOf(palletTest))
+
+
+        createPalletUpdateDao!!.delete(docTest)
+
+        assertNull(
+            "Нe удалился документ",
+            createPalletUpdateDao!!.getDocByGuid(docTest.guid)
+        )
+
+
+    }
 
     @Test
-    fun useAppContext() {
+    fun insertDeletePalletTest() {
+        val listBox = (0..3).map {
+            BoxCreatePalletDb(
+                guid = it.toString(),
+                dateChanged = null,
+                barcode = null,
+                count = 10f,
+                countBox = 2,
+                guidPallet = palletTest.guid
+
+            )
+        }
+
+        createPalletUpdateDao!!.insertOrUpdate(docTest)
+        createPalletUpdateDao!!.insertOrUpdate(productTest)
+        createPalletUpdateDao!!.insertOrUpdate(palletTest)
+
+        listBox.forEach {
+            createPalletUpdateDao!!.insertOrUpdate(it)
+        }
+
+
+        val palletTest1 = palletTest.copy(guid = "1")
+        createPalletUpdateDao!!.insertOrUpdate(palletTest1)
+        testProduct(productTest, listOf(palletTest, palletTest1))
+
+        createPalletUpdateDao!!.deleteTrigger(palletTest1)
+        testProduct(productTest, listOf(palletTest))
+
+        createPalletUpdateDao!!.delete(docTest)
+
+        assertNull(
+            "Нe удалился документ",
+            createPalletUpdateDao!!.getDocByGuid(docTest.guid)
+        )
+    }
+
+
+
+    @Test
+    fun useAppContextTest() {
         // Context of the app under test.
-        val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("com.anit.myapplication", appContext.packageName)
+        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+
+
+        assertEquals("com.anit.fastpallet4", appContext.packageName)
     }
 }

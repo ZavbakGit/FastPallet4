@@ -1,9 +1,9 @@
-package com.anit.fastpallet4.data.repositories.db
+package com.anit.fastpallet4.data.repositories.dbrealm
 
 import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.domain.intity.MetaObj
-import com.anit.fastpallet4.data.repositories.db.intity.DocumentRm
-import com.anit.fastpallet4.data.repositories.db.intity.ItemListRm
+import com.anit.fastpallet4.data.repositories.dbrealm.intity.DocumentRm
+import com.anit.fastpallet4.data.repositories.dbrealm.intity.ItemListRm
 import com.anit.fastpallet4.maping.Maping
 import com.anit.fastpallet4.domain.intity.listmetaobj.ItemListMetaObj
 

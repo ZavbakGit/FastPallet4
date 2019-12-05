@@ -10,6 +10,7 @@ import android.widget.ListView
 import com.anit.fastpallet4.R
 import com.anit.fastpallet4.presentaition.ui.util.EventKeyClick
 import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
@@ -56,6 +57,7 @@ open abstract class BaseListFragment<T> : ListFragment() {
 
         bagDisposable.add(
             flowableListItem
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     adapter.mlist = it
                 }

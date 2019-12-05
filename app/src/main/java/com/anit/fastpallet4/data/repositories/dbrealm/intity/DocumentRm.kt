@@ -1,4 +1,4 @@
-package com.anit.fastpallet4.data.repositories.db.intity
+package com.anit.fastpallet4.data.repositories.dbrealm.intity
 
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey

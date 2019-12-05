@@ -25,6 +25,7 @@ import com.anit.fastpallet4.presentaition.ui.screens.infopallet.InfoPalletsFrScr
 import com.anit.fastpallet4.presentaition.ui.util.EventKeyClick
 import com.anit.fastpallet4.presentaition.ui.util.KeyKode
 import io.reactivex.Completable
+import io.reactivex.schedulers.Schedulers
 
 
 @InjectViewState
@@ -70,6 +71,16 @@ class ListDocPresenter(
                 })
             INFOPALLET -> {
                 router.navigateTo(screens.getInfoPalletFrScreen(InfoPalletsFrScreen.InputParamObj()))
+            }
+            ADDTESTDATA -> {
+                model.addTestData()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        viewState.showSnackbarViewMess("Ок")
+                    }, {
+                        viewState.showSnackbarViewError(it.message ?: "")
+                    })
             }
         }
         return true
@@ -128,7 +139,10 @@ class ListDocPresenter(
         var itemMenu = LIST_CONTEXT_MENU.getEnumById(itemIdMenu)
         when (itemMenu) {
             LIST_CONTEXT_MENU.DELL -> {
-                viewState.showDialogConfirmDell(eventKey.id, model.getItemListMetaObj(eventKey.id)!!.description!!)
+                viewState.showDialogConfirmDell(
+                    eventKey.id,
+                    model.getItemListMetaObj(eventKey.id)!!.description!!
+                )
             }
             LIST_CONTEXT_MENU.SEND -> {
                 model.sendDocToServer(eventKey.id)
@@ -138,6 +152,7 @@ class ListDocPresenter(
                         viewState.showSnackbarViewError(it.message.toString())
                     })
             }
+
         }
 
         return true
@@ -162,6 +177,9 @@ class Model {
     @Inject
     lateinit var interacLoadDocsFromServer: UseCaseGetListDocFromServer
 
+    @Inject
+    lateinit var interacUseCaseAddTestData: UseCaseAddTestData
+
 
     @Inject
     lateinit var interacSendCreatePalletToServer: UseCaseSendCreatePalletToServer
@@ -177,7 +195,8 @@ class Model {
         UNLOAD("Выгрузить базу в файл", 2),
         INVENTORY("Инвентаризация паллеты", 3),
         SETTINGS("Настройки", 4),
-        INFOPALLET("Информация о паллете", 5);
+        INFOPALLET("Информация о паллете", 5),
+        ADDTESTDATA("Добавить тестовые данные", 6);
     }
 
     fun getMainMenuById(id: Int): MAIN_MENU? {
@@ -187,6 +206,7 @@ class Model {
             3 -> return INVENTORY
             4 -> return SETTINGS
             5 -> return INFOPALLET
+            6 -> return ADDTESTDATA
             else -> null
         }
     }
@@ -197,7 +217,8 @@ class Model {
             Pair(INVENTORY.id, INVENTORY.title),
             Pair(UNLOAD.id, UNLOAD.title),
             Pair(SETTINGS.id, SETTINGS.title),
-            Pair(INFOPALLET.id, INFOPALLET.title)
+            Pair(INFOPALLET.id, INFOPALLET.title),
+            Pair(ADDTESTDATA.id, ADDTESTDATA.title)
         )
 
     }
@@ -231,6 +252,12 @@ class Model {
             }
 
     fun loadDocs() = interacLoadDocsFromServer.load()
+
+    fun addTestData(): Completable {
+        return Completable.fromAction {
+            interacUseCaseAddTestData.add()
+        }
+    }
 
     fun dellDoc(id: Int) {
         var guid: String = getItemListMetaObj(id)!!.getGuid()!!
