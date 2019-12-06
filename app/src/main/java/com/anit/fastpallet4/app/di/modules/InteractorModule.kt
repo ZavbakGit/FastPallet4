@@ -3,6 +3,7 @@ package com.anit.fastpallet4.app.di.modules
 
 
 import com.anit.fastpallet4.domain.usecase.*
+import com.anit.fastpallet4.domain.usecase.interactor.InteractorAddTestData
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetFlowableListMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObj
 import com.anit.fastpallet4.domain.usecase.interactor.InteractorUseCaseGetMetaObjByGuidServer
@@ -48,6 +49,12 @@ class InteractorModule{
     @Provides
     fun provideUseCaseGetInfoPallet(): UseCaseGetInfoPallet
             = InteractorGetInfoPallet()
+
+
+    @Singleton
+    @Provides
+    fun provideUseCaseAddTestData(): UseCaseAddTestData
+            = InteractorAddTestData()
 
 
 

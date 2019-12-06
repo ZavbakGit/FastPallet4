@@ -71,6 +71,9 @@ class ListDocPresenter(
             INFOPALLET -> {
                 router.navigateTo(screens.getInfoPalletFrScreen(InfoPalletsFrScreen.InputParamObj()))
             }
+            ADD_TEST_DATA->{
+                model.addTestData()
+            }
         }
         return true
     }
@@ -166,6 +169,9 @@ class Model {
     @Inject
     lateinit var interacSendCreatePalletToServer: UseCaseSendCreatePalletToServer
 
+    @Inject
+    lateinit var interactorAddTestData: UseCaseAddTestData
+
     private var listDoc: MutableList<ItemListMetaObj?> = mutableListOf()
 
     init {
@@ -177,7 +183,8 @@ class Model {
         UNLOAD("Выгрузить базу в файл", 2),
         INVENTORY("Инвентаризация паллеты", 3),
         SETTINGS("Настройки", 4),
-        INFOPALLET("Информация о паллете", 5);
+        INFOPALLET("Информация о паллете", 5),
+        ADD_TEST_DATA("Добавить тестовые данные", 6);
     }
 
     fun getMainMenuById(id: Int): MAIN_MENU? {
@@ -187,6 +194,7 @@ class Model {
             3 -> return INVENTORY
             4 -> return SETTINGS
             5 -> return INFOPALLET
+            6->  return ADD_TEST_DATA
             else -> null
         }
     }
@@ -197,9 +205,14 @@ class Model {
             Pair(INVENTORY.id, INVENTORY.title),
             Pair(UNLOAD.id, UNLOAD.title),
             Pair(SETTINGS.id, SETTINGS.title),
-            Pair(INFOPALLET.id, INFOPALLET.title)
+            Pair(INFOPALLET.id, INFOPALLET.title),
+            Pair(ADD_TEST_DATA.id, ADD_TEST_DATA.title)
         )
 
+    }
+
+    fun addTestData(){
+        interactorAddTestData.add()
     }
 
     fun createNewInventory() {

@@ -3,19 +3,19 @@ package com.anit.fastpallet4.presentaition.presenter.createpallet.pallet
 
 import com.anit.fastpallet4.app.App
 import com.anit.fastpallet4.common.formatDate
-import com.anit.fastpallet4.domain.intity.metaobj.*
-import com.anit.fastpallet4.domain.intity.metaobj.Status.*
+import com.anit.fastpallet4.domain.intity.metaobj.Box
+import com.anit.fastpallet4.domain.intity.metaobj.CreatePallet
+import com.anit.fastpallet4.domain.intity.metaobj.Pallet
+import com.anit.fastpallet4.domain.intity.metaobj.Status.LOADED
+import com.anit.fastpallet4.domain.intity.metaobj.Status.NEW
+import com.anit.fastpallet4.domain.intity.metaobj.StringProduct
 import com.anit.fastpallet4.domain.usecase.UseCaseGetMetaObj
 import com.anit.fastpallet4.domain.utils.getWeightByBarcode
 import com.anit.fastpallet4.domain.utils.isPallet
 import com.anit.fastpallet4.presentaition.ui.base.BasePresenter
-import com.anit.fastpallet4.presentaition.ui.base.BaseView
 import com.anit.fastpallet4.presentaition.ui.base.ItemList
 import com.anit.fastpallet4.presentaition.ui.screens.creatpallet.pallet.PalletCreatePalletFrScreen
 import com.anit.fastpallet4.presentaition.ui.screens.inventory.CreatePalletView
-import com.anit.fastpallet4.presentaition.ui.util.EventKeyClick
-import com.anit.fastpallet4.presentaition.ui.util.KeyKode
-
 import com.arellomobile.mvp.InjectViewState
 import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
